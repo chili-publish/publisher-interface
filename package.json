@@ -1,6 +1,6 @@
 {
   "name": "@chili-publish/publisher-connector",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "chili-publish",
   "description": "PublisherConnector is a class object that allows you to interact with the CHILI Publisher editorObject via postMessage without the complexity of postMessage.",
   "repository": {
