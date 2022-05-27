@@ -1,6 +1,6 @@
 {
   "name": "@chili-publish/publisher-connector",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": "chili-publish",
   "description": "PublisherConnector is a class object that allows you to interact with the CHILI Publisher editorObject via postMessage without the complexity of postMessage.",
   "repository": {
@@ -9,9 +9,10 @@
   },
   "license": "MIT",
   "source": "./src/PublisherConnector.ts",
-  "main": "./dist/PublisherConnector.js",
-  "types": "./dist/PublisherConnector.d.ts",
-  "wrapper": "./dist/chiliInternalWrapper.js",
+  "main": "./lib/PublisherConnector.js",
+  "types": "./lib/PublisherConnector.d.ts",
+  "web-wrapper": "./dist/chiliInternalWrapper.min.js",
+  "web-connector": "./dist/PublisherConnector.min.js",
   "targets": {
     "main": {
       "sourceMap": false
@@ -19,7 +20,7 @@
     "types": {
       "sourceMap": false
     },
-    "wrapper": {
+    "web-wrapper": {
       "context": "browser",
       "engines": {
         "browsers": "last 2 Chrome version, last 2 Firefox version, last 2 Safari version, last 2 Edge version"
@@ -27,10 +28,21 @@
       "outputFormat": "global",
       "includeNodeModules": true,
       "source": "./onServer/chiliInternalWrapper.ts"
+    },
+    "web-connector": {
+      "context": "browser",
+      "outputFormat": "global",
+      "engines": {
+        "browsers": "last 2 Chrome version, last 2 Firefox version, last 2 Safari version, last 2 Edge version"
+      },
+      "optimize": true,
+      "includeNodeModules": true,
+      "scopeHoist": false
     }
   },
   "files": [
-    "dist/**"
+    "dist/**",
+    "lib/**"
   ],
   "devDependencies": {
     "@parcel/packager-ts": "2.5.0",
