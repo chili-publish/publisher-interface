@@ -5,3 +5,4 @@ yarn.lock
 .vscode
 dist
 distServer
+lib
