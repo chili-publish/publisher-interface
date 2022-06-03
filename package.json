@@ -31,13 +31,13 @@
     },
     "web-connector": {
       "context": "browser",
-      "outputFormat": "global",
+      "outputFormat": "esmodule",
       "engines": {
         "browsers": "last 2 Chrome version, last 2 Firefox version, last 2 Safari version, last 2 Edge version"
       },
       "optimize": true,
       "includeNodeModules": true,
-      "scopeHoist": false
+      "isLibrary": true
     }
   },
   "files": [
