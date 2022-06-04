@@ -26,16 +26,25 @@ or through yarn
 
 1. Import PublisherConnector.
 
+If you downloaded the library:
 ```javascript
 import {PublisherConnector} from "@chili-publish/publisher-connector";
 ```
 
+or using in the web via unpkg URL:
+
+```javascript
+import {PublisherConnector} from "https://unpkg.com/@chili-publish/publisher-connector@latest/dist/PublisherConnector.min.js";
+```
+
+<br/>
 2. Get the HTMLIFrameElement which contains the CHILI Editor.
 
 ```javascript
 const iframe = document.getElementById("editor-iframe");
 ```
 
+<br/>
 3. Create an instance of PublisherConnector by using the `build` method and passing the HTMLIFrameElement (created above)
    as a parameter. The `build` method returns a promise, which when resolved has the instance of the PublisherConnector.
 
@@ -56,24 +65,23 @@ If you set the `src` attribute of the IFrame in your HTML and have a script tag 
 everything will be fine. The issue is only if you were to wait until IFrame was loaded before calling the `build`
 method.
 
-For example this would be fine - assuming PublisherConnector was packaged (using Parcel, Webpack, etc.) into a browser safe JS file called `publisher-connector-packaged.js`:
+For example the below code will work because the `build` method is called before the IFrame is loaded.
 
 ```html
-
 <body>
-<iframe id="editor-iframe" style="width:1200px; height:800px"
+    <iframe id="editor-iframe" style="width:1200px; height:800px"
         src="https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G07gMFMq07X+SG2o8KlW8oAeZGvqoB1a0YvkbeZU1wJK15aIhANgZmhg+13NQlxpBEq7Q=="></iframe>
-<script type="module">
-    import {PublisherConnector} from './publisher-connector-packaged.js';
-
-    const iframe = document.getElementById("editor-iframe");
-
-    (async () => {
-        const publisherConnector = await PublisherConnector.build(iframe);
-        const documentName = await publisherConnector.getObject("document.name");
-        console.log(documentName);
-    })();
-</script>
+    <script type="module">
+        import {PublisherConnector} from 'https://unpkg.com/@chili-publish/publisher-connector@latest/dist/PublisherConnector.min.js';
+    
+        const iframe = document.getElementById("editor-iframe");
+    
+        (async () => {
+            const publisherConnector = await PublisherConnector.build(iframe);
+            const documentName = await publisherConnector.getObject("document.name");
+            console.log(documentName);
+        })();
+    </script>
 </body>
 ```
 
