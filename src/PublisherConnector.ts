@@ -114,7 +114,7 @@ export class PublisherConnector {
   private constructor() {
   }
 
-  static async build(iframe: HTMLIFrameElement) {
+  static async build(iframe: HTMLIFrameElement, options: {timeout?: number, penpalDebug?:boolean} = {}) {
     const publisherConnector = new PublisherConnector();
     publisherConnector.child = await connectToChild<ChiliWrapper>({
       // The iframe to which a connection should be made
@@ -123,6 +123,8 @@ export class PublisherConnector {
       methods: {
         handleEvents: publisherConnector.handleEvents.bind(publisherConnector),
       },
+      timeout: options.timeout,
+      debug: options.penpalDebug
     }).promise;
     return publisherConnector;
   }
