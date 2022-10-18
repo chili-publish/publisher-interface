@@ -105,7 +105,9 @@ interface ChiliWrapper {
   ): Result<undefined>;
 }
 
-export class PublisherConnector {
+
+
+export class PublisherInterface {
   private child!: AsyncMethodReturns<ChiliWrapper>;
   private chiliEventListenerCallbacks: Map<string, (targetId: string) => void> =
       new Map<string, (targetId: string) => void>();
@@ -115,18 +117,18 @@ export class PublisherConnector {
   }
 
   static async build(iframe: HTMLIFrameElement, options: {timeout?: number, penpalDebug?:boolean} = {}) {
-    const publisherConnector = new PublisherConnector();
-    publisherConnector.child = await connectToChild<ChiliWrapper>({
+    const publisherInterface = new PublisherInterface();
+    publisherInterface.child = await connectToChild<ChiliWrapper>({
       // The iframe to which a connection should be made
       iframe,
       // Methods the parent is exposing to the child
       methods: {
-        handleEvents: publisherConnector.handleEvents.bind(publisherConnector),
+        handleEvents: publisherInterface.handleEvents.bind(publisherInterface),
       },
       timeout: options.timeout,
       debug: options.penpalDebug
     }).promise;
-    return publisherConnector;
+    return publisherInterface;
   }
 
   private handleEvents(eventName: string, id: string) {
@@ -255,7 +257,7 @@ export class PublisherConnector {
    *
    * @example
    * ```ts
-   * publisherConnector.addListener("FrameMoved", (targetId)=>{console.log(targetId)}));
+   * publisherInterface.addListener("FrameMoved", (targetId)=>{console.log(targetId)}));
    * ```
    * @param eventName - A case-sensitive string representing the editor event type to listen for.
    * @param callbackFunction - A function that executes when the event is triggered.
@@ -312,7 +314,7 @@ export class PublisherConnector {
    * @example
    * // Will add a new frame of type text on page of index 0 at coordinates X: 10 mm and Y: 15 mm with width: 100 mm and height: 50 mm
    * ```ts
-   * publisherConnector.ExecuteFunction('document.pages[0].frames', 'Add', 'text', '10 mm', '15 mm', '100 mm', '50 mm');
+   * publisherInterface.ExecuteFunction('document.pages[0].frames', 'Add', 'text', '10 mm', '15 mm', '100 mm', '50 mm');
    * ```
    * @param chiliPath - A case-sensitive string query path for selecting properties and objects in a CHILI document.
    * @param functionName - A case-sensitive string of the name of the function to execute.
@@ -341,7 +343,7 @@ export class PublisherConnector {
    * @example
    * ```ts
    * \\ This will get a 1000 by 1000 image of the first page and open it in a popup.
-   * let base64 = publisherConnector.GetPageSnapshot('0', '1000x1000', null, null, 'preview', true);
+   * let base64 = publisherInterface.GetPageSnapshot('0', '1000x1000', null, null, 'preview', true);
    *
    * let newImage = new Image();
    * newImage.src = "data:image/png;base64," + base64;
@@ -546,3 +548,5 @@ export class PublisherConnector {
     }
   }
 }
+
+export {PublisherInterface as PublisherConnector};
