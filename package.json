@@ -1,18 +1,18 @@
 {
-  "name": "@chili-publish/publisher-connector",
-  "version": "0.2.2",
+  "name": "@chili-publish/publisher-interface",
+  "version": "0.3.0",
   "author": "chili-publish",
-  "description": "PublisherConnector is a class object that allows you to interact with the CHILI Publisher editorObject via postMessage without the complexity of postMessage.",
+  "description": "PublisherInterface is a class object that allows you to interact with the CHILI Publisher editorObject via postMessage without the complexity of postMessage.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/chili-publish/publisher-connector.git"
+    "url": "git://github.com/chili-publish/publisher-interface.git"
   },
   "license": "MIT",
-  "source": "./src/PublisherConnector.ts",
-  "main": "./lib/PublisherConnector.js",
-  "types": "./lib/PublisherConnector.d.ts",
+  "source": "./src/PublisherInterface.ts",
+  "main": "./lib/PublisherInterface.js",
+  "types": "./lib/PublisherInterface.d.ts",
   "web-wrapper": "./dist/chiliInternalWrapper.min.js",
-  "web-connector": "./dist/PublisherConnector.min.js",
+  "web-connector": "./dist/PublisherInterface.min.js",
   "targets": {
     "main": {
       "sourceMap": false
@@ -58,6 +58,7 @@
     "penpal": "^6.2.1"
   },
   "scripts": {
-    "build": "parcel build"
+    "build": "parcel build",
+    "build-docs": "typedoc ./src/PublisherInterface.ts"
   }
 }
