@@ -1,8 +1,8 @@
 # Internal Wrapper
 
-For the PublisherConnector to work, the internal wrapper must be installed on the CHILI server.
+For the PublisherInterface to work, the internal wrapper must be installed on the CHILI server.
 
-⛔ This script and instructions are meant for use on a CHILI server. If you are using PublisherConnector for with CHILI
+⛔ This script and instructions are meant for use on a CHILI server. If you are using PublisherInterface for with CHILI
 publisher Online, you can just ignore this file.
 
 ### Install
