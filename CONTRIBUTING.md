@@ -1,16 +1,16 @@
 # Contributing
 
-Hi there! We're thrilled that you'd like to contribute to our publisher-connector project. We definitely could use your help to keep this publisher-connector great.
+Hi there! We're thrilled that you'd like to contribute to our publisher-interface project. We definitely could use your help to keep this publisher-interface great.
 
 Please note that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
 
 ## Submitting a pull request
 
-1. [Fork](https://github.com/chili-publish/publisher-connector/fork) and clone this repository
+1. [Fork](https://github.com/chili-publish/publisher-interface/fork) and clone this repository
 2. Create a new branch: `git checkout -b my-branch-name` \*
 3. Make your change and remember to add tests
 4. Build the project locally and run local tests
-5. Push to your fork and [submit a pull request](https://github.com/chili-publish/publisher-connector/compare)
+5. Push to your fork and [submit a pull request](https://github.com/chili-publish/publisher-interface/compare)
 6. Pat yourself on the back and wait for your pull request to be reviewed and get merged.
 
 \*replace my-branch-name with something specific. We use the prefixes fix and feature in our branches to indicate what they represent. An example for a branch that fixes a bug in playAnimation f.e. could be `fix/play-animation-fixdescription`
