@@ -549,4 +549,4 @@ export class PublisherInterface {
   }
 }
 
-export {PublisherInterface as PublisherConnector};
+
