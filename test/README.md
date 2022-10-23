@@ -15,6 +15,13 @@ You then run the test like so:
 ```bash
 npm run test --  --url "https://ft-nostress.chili-publish.online/ft-nostress/editor_html.aspx?doc=708c426d-969c-49c5-98d5-0d7c0a09a3ab&apiKey=RFdcWfIj_xkLyi+1aczJq7luzqgKrR7sUnXFWly5xDaNTg+FjXetCMGDQXq1B+j73"
 ```
+The `--url` argument takes in an active (authenticated API key) Publisher URL.
+
+<br/>
+
+*Note: the test will spin up a server on localhost:3001. This is a hardcoded value.*
+
+<br/>
 
 The `--url` argument takes in an active (authenticated API key) Publisher URL.
 
