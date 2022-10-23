@@ -26,10 +26,11 @@ if (iframeUrl == null) {
 }
 
 process.on("SIGHUP", () => {
-  exit(1);
+  exit(0);
 });
 
 const requestListener = function (req, res) {
+  
   const filePath =
     "./test/" + (req.url == "/" || req.url == "" ? "/index.html" : req.url);
   const contentType = filePath.includes(".js")
@@ -39,9 +40,8 @@ const requestListener = function (req, res) {
   fs.readFile(filePath, "utf8", function (error, content) {
     if (error) {
       res.writeHead(500);
-      res.end("Error reading test file: " + error.code);
-      console.log("Error reading test file: " + error.code);
-      exit(1);
+      res.end("Error reading file: " + error.code);
+      console.log("Error reading file: " + error.code);
     } else {
       res.writeHead(200, { "Content-Type": contentType });
       res.end(content.replace(`src=""`, `src="${iframeUrl}"`), "utf-8");
