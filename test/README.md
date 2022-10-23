@@ -1,19 +1,27 @@
-# Tests README
+# Testing README
 
-These tests are unique because Publisher was not designed with testing in mind. Therefore, we must bootstrap our tests on top of Playwright and some custom in browser scripting.
+These tests are unique because Publisher was not designed with testing in mind. Therefore, we must bootstrap our tests on top of Playwright with some custom in browser scripting, and some JavaScript hackery.
 
 ## Run
 
 To the run the tests it is required that you have a working Publisher Editor URL to a document with at least one variable.
 
-It is strongly suggested you use a lightweight document.
-It is also suggested to use an anonymous API
+- It is strongly suggested you use a lightweight document.
+- It is also suggested to use an anonymous API
+- The document must have at least one variable
 
 You then run the test like so:
 
 ```bash
 npm run test --  --url "https://ft-nostress.chili-publish.online/ft-nostress/editor_html.aspx?doc=708c426d-969c-49c5-98d5-0d7c0a09a3ab&apiKey=RFdcWfIj_xkLyi+1aczJq7luzqgKrR7sUnXFWly5xDaNTg+FjXetCMGDQXq1B+j73"
 ```
+The `--url` argument takes in an active (authenticated API key) Publisher URL.
+
+<br/>
+
+*Note: the test will spin up a server on localhost:3001. This is a hardcoded value.*
+
+<br/>
 
 ## Test File Setup
 
@@ -33,8 +41,9 @@ If the test returns a `true`, then it will be considered as passed by Playwright
 
 For each test, the Publisher Editor is being loaded in the iframe. Thus pretty much all test rely on `addListener` to listen for _DocumentFullyLoaded_ or _DocumentFullyRendered_. A timeout could also be used to avoid reliance on `addListener`.
 
-### Writing new tests
+<br/>
 
+### Writing new tests
 So if you want to write a new test you must then do the following:
 
 - Add your test to `./test/tests` directory as a js file.
@@ -49,3 +58,4 @@ export default async function (publisherConnector) {
 ```
 
 - You should probably add a timeout or await on `addListener` for _DocumentFullyLoaded_ or _DocumentFullyRendered_. The Publisher Editor is load in the iframe with each call, so your test will potentially run before the document is loaded.
+- Your function should return a Promise that resolved to `true` if the test passed or `false` if the test failed. Do not worry about exceptions, as they will be counted as a failure automatically.
