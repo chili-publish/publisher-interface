@@ -30,6 +30,7 @@ process.on("SIGTERM", () => {
 });
 
 const requestListener = function (req, res) {
+  
   const filePath =
     "./test/" + (req.url == "/" || req.url == "" ? "/index.html" : req.url);
   const contentType = filePath.includes(".js")
