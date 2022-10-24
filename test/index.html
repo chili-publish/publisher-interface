@@ -12,11 +12,14 @@
       const iframe = document.getElementsByTagName("iframe")[0];
 
       window.runTest = async (file) => {
-        iframe.src += document.getElementById("url").getAttribute("src");
-        const publisherInterace = await PublisherInterface.build(iframe);
+
+        const createInterface = (options = {}) => {
+          iframe.src += document.getElementById("url").getAttribute("src");
+          return PublisherInterface.build(iframe, options);
+        }
 
         const { default: testFunction } = await import(`/tests/${file}`);
-        const result = await testFunction(publisherInterace);
+        const result = await testFunction(createInterface);
 
         return result;
       };

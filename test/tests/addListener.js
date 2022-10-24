@@ -1,6 +1,9 @@
-export default async function addListener(publisherConnector) {
+export default async function addListener(createInterface) {
+
+  const publisherInterface = await createInterface();
+
   return new Promise((resolve) => {
-    publisherConnector.addListener("DocumentFullyRendered", () => {
+    publisherInterface.addListener("DocumentFullyRendered", () => {
       resolve(true);
     });
 

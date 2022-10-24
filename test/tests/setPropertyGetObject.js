@@ -1,10 +1,13 @@
-export default async function (publisherInterace) {
+export default async function (createInterface) {
+
+  const publisherInterface = await createInterface();
+
   await new Promise((resolve) =>
-    publisherInterace.addListener("DocumentFullyLoaded", resolve)
+    publisherInterface.addListener("DocumentFullyLoaded", resolve)
   );
 
-  await publisherInterace.setProperty("document", "name", "test123");
-  const documentName = await publisherInterace.getObject("document.name");
+  await publisherInterface.setProperty("document", "name", "test123");
+  const documentName = await publisherInterface.getObject("document.name");
 
   if (documentName == "test123") {
     return true;

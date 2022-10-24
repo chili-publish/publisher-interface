@@ -1,21 +1,24 @@
-export default async function (publisherInterace) {
+export default async function (createInterface) {
+
+  const publisherInterface = await createInterface();
+
   await new Promise((resolve) =>
-    publisherInterace.addListener("DocumentFullyLoaded", resolve)
+    publisherInterface.addListener("DocumentFullyLoaded", resolve)
   );
 
-  const count = await publisherInterace.getObject("document.variables.count");
+  const count = await publisherInterface.getObject("document.variables.count");
 
-  const newVariable = await publisherInterace.executeFunction(
+  const newVariable = await publisherInterface.executeFunction(
     "document.variables",
     "Add"
   );
-  await publisherInterace.setProperty(
+  await publisherInterface.setProperty(
     "document.variables[" + newVariable.id + "]",
     "value",
     "stuff"
   );
 
-  const newCount = await publisherInterace.getObject(
+  const newCount = await publisherInterface.getObject(
     "document.variables.count"
   );
 

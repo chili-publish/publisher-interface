@@ -1,9 +1,12 @@
-export default async function (publisherInterace) {
+export default async function (createInterface) {
+
+  const publisherInterface = await createInterface();
+
   await new Promise((resolve) =>
-    publisherInterace.addListener("DocumentFullyRendered", resolve)
+    publisherInterface.addListener("DocumentFullyRendered", resolve)
   );
 
-  const snapshot = await publisherInterace.getPageSnapshot(
+  const snapshot = await publisherInterface.getPageSnapshot(
     0,
     "100%",
     null,
@@ -11,7 +14,7 @@ export default async function (publisherInterace) {
     "preview",
     false
   );
-  const document = await publisherInterace.getObject("document");
+  const document = await publisherInterface.getObject("document");
   const realWidth = parseInt(document.pixelWidth);
 
   return new Promise((resolve) => {
