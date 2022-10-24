@@ -1,0 +1,28 @@
+<html>
+  <head> </head>
+  <body>
+    <div id="test">
+      <div id="url" src=""></div>
+      <iframe></iframe>
+      <ul id="results"></ul>
+    </div>
+    <script type="module">
+      import { PublisherInterface } from "./PublisherInterface.min.js";
+
+      const iframe = document.getElementsByTagName("iframe")[0];
+
+      window.runTest = async (file) => {
+
+        const createInterface = (options = {}) => {
+          iframe.src += document.getElementById("url").getAttribute("src");
+          return PublisherInterface.build(iframe, options);
+        }
+
+        const { default: testFunction } = await import(`/tests/${file}`);
+        const result = await testFunction(createInterface);
+
+        return result;
+      };
+    </script>
+  </body>
+</html>
