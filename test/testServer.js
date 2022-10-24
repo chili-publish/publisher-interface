@@ -25,12 +25,11 @@ if (iframeUrl == null) {
   exit(1);
 }
 
-process.on("SIGHUP", () => {
+process.on("SIGTERM", () => {
   exit(0);
 });
 
 const requestListener = function (req, res) {
-  
   const filePath =
     "./test/" + (req.url == "/" || req.url == "" ? "/index.html" : req.url);
   const contentType = filePath.includes(".js")
