@@ -1,3 +1,5 @@
+declare const window: {OnEditorEvent? : (arg0: string, arg1: string) => void}
+
 import {AsyncMethodReturns, connectToChild} from "penpal";
 import {Result} from "./types";
 
@@ -260,14 +262,19 @@ export class PublisherInterface {
    * publisherInterface.addListener("FrameMoved", (targetId)=>{console.log(targetId)}));
    * ```
    * @param eventName - A case-sensitive string representing the editor event type to listen for.
-   * @param callbackFunction - A function that executes when the event is triggered.
+   * @param callbackFunction - A function that executes when the event is triggered. If callback is null, the listener will instead call window.OnEditorEvent
    */
   public async addListener(
     eventName: string,
-    callbackFunction: (targetId: string) => void
+    callbackFunction?: (targetId: string) => void
   ): Promise<void> {
-    !this.chiliEventListenerCallbacks.has(eventName) &&
-    this.chiliEventListenerCallbacks.set(eventName, callbackFunction);
+
+    console.log(this);
+
+    this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetId) => {
+      if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetId)
+    } : callbackFunction)
+    
     const response = await this.child.addListener(eventName);
     if (response.isError) {
       throw new Error(response.error)
