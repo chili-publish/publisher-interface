@@ -108,17 +108,38 @@ interface ChiliWrapper {
 }
 
 
+export type buildOptions = {
+  /**
+   * If not null, the number of milliseconds to wait for a connection to iframe before throwing an exception.
+   */
+  timeout?: number,
+  /**
+   * If true, the underlining library penpal will log debug info in the console. Useful for debugging connection issues.
+   */
+  penpalDebug?:boolean, 
+  /**
+   * Pass in an array of events that will be auto-added via `addListener()`
+   */
+  events?:string|{name:string, func?:(targetId: string) => void}[]
+}
 
 export class PublisherInterface {
   private child!: AsyncMethodReturns<ChiliWrapper>;
   private chiliEventListenerCallbacks: Map<string, (targetId: string) => void> =
       new Map<string, (targetId: string) => void>();
 
+  
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {
-  }
+  private constructor() {}
 
-  static async build(iframe: HTMLIFrameElement, options: {timeout?: number, penpalDebug?:boolean} = {}) {
+  /**
+   * The build method will wait for a connection to the other side of iframe. Must be called before iframe `onload` event is fired.
+   * 
+   * @param iframe 
+   * @param options
+   * @returns {PublisherInterface}
+   */
+  static async build(iframe: HTMLIFrameElement, options: buildOptions  = {}) {
     const publisherInterface = new PublisherInterface();
     publisherInterface.child = await connectToChild<ChiliWrapper>({
       // The iframe to which a connection should be made
@@ -130,6 +151,20 @@ export class PublisherInterface {
       timeout: options.timeout,
       debug: options.penpalDebug
     }).promise;
+
+    const events = options.events;
+
+    if (events != null && events.length > 0) {
+      for (const event of events) {
+        if (typeof(event) == "string") {
+          publisherInterface.addListener(event)
+        }
+        else {
+          publisherInterface.addListener(event.name, event.func)
+        }
+      }
+    }
+
     return publisherInterface;
   }
 
@@ -262,12 +297,14 @@ export class PublisherInterface {
    * publisherInterface.addListener("FrameMoved", (targetId)=>{console.log(targetId)}));
    * ```
    * @param eventName - A case-sensitive string representing the editor event type to listen for.
-   * @param callbackFunction - A function that executes when the event is triggered.
+   * @param callbackFunction - A function that executes when the event is triggered. If callback is null, the listener will instead call window.OnEditorEvent
    */
   public async addListener(
     eventName: string,
     callbackFunction?: (targetId: string) => void
   ): Promise<void> {
+
+    console.log(this);
 
     this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetId) => {
       if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetId)
@@ -552,6 +589,6 @@ export class PublisherInterface {
       throw new Error(response.error)
     }
   }
-}
 
+}
 
