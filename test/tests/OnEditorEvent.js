@@ -1,8 +1,11 @@
-export default async function (publisherInterace) {
-  await publisherInterace.addListener("DocumentFullyRendered");
+export default async function (createInterface) {
+
+  const publisherInterface = await createInterface();
+
+  await publisherInterface.addListener("DocumentFullyRendered");
   return new Promise((resolve) => {
     window.OnEditorEvent = (eventName, targetId) => {
-      if (eventName == "DocumentFullyRendered") resolve(true);
+      if (eventName == "DocumentFullyRendered" && targetId != null) resolve(true);
     };
 
     setTimeout(() => {
