@@ -303,9 +303,7 @@ export class PublisherInterface {
     eventName: string,
     callbackFunction?: (targetId: string) => void
   ): Promise<void> {
-
-    console.log(this);
-
+    
     this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetId) => {
       if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetId)
     } : callbackFunction)
