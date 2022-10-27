@@ -174,6 +174,41 @@ export class PublisherInterface {
     return eventName;
   }
 
+  #editorObject:EditorObjectAlias|null = null
+  /**
+   * Returns an alias for editorObject with similarly named functions. This is to help with backwards compatibility, but these functions still return a Promise.
+   */
+  get editorObject() {
+    if (this.#editorObject == null) {
+      this.#editorObject = {
+          Alert: this.alert.bind(this),
+          GetDirtyState: this.getDirtyState.bind(this),
+          NextPage: this.nextPage.bind(this),
+          PreviousPage: this.previousPage.bind(this),
+          SetSelectedPage: this.setSelectedPage.bind(this),
+          GetSelectedPage: this.getSelectedPage.bind(this),
+          GetSelectedPageName: this.getSelectedPageName.bind(this),
+          GetNumPages: this.getNumPages.bind(this),
+          RemoveListener:this.removeListener.bind(this),
+          AddListener: this.addListener.bind(this),
+          GetObject: this.getObject.bind(this),
+          SetProperty: this.setProperty.bind(this),
+          ExecuteFunction: this.executeFunction.bind(this),
+          GetPageSnapshot: this.getPageSnapshot.bind(this),
+          GetFrameSnapshot: this.getFrameSnapshot.bind(this),
+          GetFrameSubjectArea: this.getFrameSubjectArea.bind(this),
+          SetFrameSubjectArea: this.setFrameSubjectArea.bind(this),
+          ClearFrameSubjectArea: this.clearFrameSubjectArea.bind(this),
+          GetAssetSubjectInfo: this.getAssetSubjectInfo.bind(this),
+          SetAssetSubjectInfo: this.setAssetSubjectInfo.bind(this),
+          ClearAssetSubjectInfo: this.clearAssetSubjectInfo.bind(this),
+          SetVariableIsLocked: this.setVariableIsLocked.bind(this),
+        }
+    }
+
+    return this.#editorObject;
+  }
+
   /**
    * Displays a modal box within the editor UI containing a title with a message.
    *
@@ -589,4 +624,31 @@ export class PublisherInterface {
   }
 }
 
+/**
+   *  An alias for the editorObject
+*/
+export type EditorObjectAlias = {
+  Alert: PublisherInterface["alert"],
+  GetDirtyState: PublisherInterface["getDirtyState"],
+  NextPage: PublisherInterface["nextPage"],
+  PreviousPage: PublisherInterface["previousPage"],
+  SetSelectedPage: PublisherInterface["setSelectedPage"],
+  GetSelectedPage: PublisherInterface["getSelectedPage"],
+  GetSelectedPageName: PublisherInterface["getSelectedPageName"],
+  GetNumPages: PublisherInterface["getNumPages"],
+  RemoveListener:PublisherInterface["removeListener"],
+  AddListener: PublisherInterface["addListener"],
+  GetObject: PublisherInterface["getObject"],
+  SetProperty: PublisherInterface["setProperty"],
+  ExecuteFunction: PublisherInterface["executeFunction"],
+  GetPageSnapshot: PublisherInterface["getPageSnapshot"],
+  GetFrameSnapshot: PublisherInterface["getFrameSnapshot"],
+  GetFrameSubjectArea: PublisherInterface["getFrameSubjectArea"],
+  SetFrameSubjectArea: PublisherInterface["setFrameSubjectArea"],
+  ClearFrameSubjectArea: PublisherInterface["clearFrameSubjectArea"],
+  GetAssetSubjectInfo: PublisherInterface["getAssetSubjectInfo"],
+  SetAssetSubjectInfo: PublisherInterface["setAssetSubjectInfo"],
+  ClearAssetSubjectInfo: PublisherInterface["clearAssetSubjectInfo"],
+  SetVariableIsLocked: PublisherInterface["setVariableIsLocked"]
+}
 
