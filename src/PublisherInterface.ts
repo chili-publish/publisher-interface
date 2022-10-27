@@ -108,6 +108,20 @@ interface ChiliWrapper {
 }
 
 
+export type buildOptions = {
+  /**
+   * If not null, the number of milliseconds to wait for a connection to iframe before throwing an exception.
+   */
+  timeout?: number,
+  /**
+   * If true, the underlining library penpal will log debug info in the console. Useful for debugging connection issues.
+   */
+  penpalDebug?:boolean, 
+  /**
+   * Pass in an array of events that will be auto-added via `addListener()`
+   */
+  events?:string|{name:string, func?:(targetId: string) => void}[]
+}
 
 export class PublisherInterface {
   private child!: AsyncMethodReturns<ChiliWrapper>;
@@ -118,7 +132,14 @@ export class PublisherInterface {
   private constructor() {
   }
 
-  static async build(iframe: HTMLIFrameElement, options: {timeout?: number, penpalDebug?:boolean} = {}) {
+  /**
+   * The build method will wait for a connection to the other side of iframe. Must be called before iframe `onload` event is fired.
+   * 
+   * @param iframe 
+   * @param options
+   * @returns {PublisherInterface}
+   */
+  static async build(iframe: HTMLIFrameElement, options: buildOptions  = {}) {
     const publisherInterface = new PublisherInterface();
     publisherInterface.child = await connectToChild<ChiliWrapper>({
       // The iframe to which a connection should be made
@@ -130,6 +151,20 @@ export class PublisherInterface {
       timeout: options.timeout,
       debug: options.penpalDebug
     }).promise;
+
+    const events = options.events;
+
+    if (events != null && events.length > 0) {
+      for (const event of events) {
+        if (typeof(event) == "string") {
+          publisherInterface.addListener(event)
+        }
+        else {
+          publisherInterface.addListener(event.name, event.func)
+        }
+      }
+    }
+
     return publisherInterface;
   }
 
