@@ -1,68 +1,20 @@
 {
-  "name": "@chili-publish/publisher-interface",
-  "version": "0.3.1",
+  "name": "@chili-publish/publisher-interface-wiki",
+  "version": "0.x",
   "author": "chili-publish",
   "description": "PublisherInterface is a class object that allows you to interact with the CHILI Publisher editorObject via postMessage without the complexity of postMessage.",
   "repository": {
     "type": "git",
     "url": "git://github.com/chili-publish/publisher-interface.git"
   },
+  "private": true,
   "license": "MIT",
-  "source": "./src/PublisherInterface.ts",
-  "main": "./lib/PublisherInterface.js",
-  "types": "./lib/PublisherInterface.d.ts",
-  "web-wrapper": "./dist/chiliInternalWrapper.min.js",
-  "web-connector": "./dist/PublisherInterface.min.js",
-  "targets": {
-    "main": {
-      "sourceMap": false
-    },
-    "types": {
-      "sourceMap": false
-    },
-    "web-wrapper": {
-      "context": "browser",
-      "engines": {
-        "browsers": "last 2 Chrome version, last 2 Firefox version, last 2 Safari version, last 2 Edge version"
-      },
-      "outputFormat": "global",
-      "includeNodeModules": true,
-      "source": "./onServer/chiliInternalWrapper.ts"
-    },
-    "web-connector": {
-      "context": "browser",
-      "outputFormat": "esmodule",
-      "engines": {
-        "browsers": "last 2 Chrome version, last 2 Firefox version, last 2 Safari version, last 2 Edge version"
-      },
-      "optimize": true,
-      "includeNodeModules": true,
-      "isLibrary": true
-    }
-  },
-  "files": [
-    "dist/**",
-    "lib/**"
-  ],
   "devDependencies": {
-    "@parcel/packager-ts": "2.5.0",
-    "@parcel/transformer-typescript-types": "2.5.0",
-    "@playwright/test": "^1.27.1",
-    "@types/node": "^18.11.2",
-    "@typescript-eslint/eslint-plugin": "^5.27.0",
-    "@typescript-eslint/parser": "^5.27.0",
-    "eslint": "^8.16.0",
-    "parcel": "2.5.0",
-    "playwright": "^1.27.1",
-    "typedoc": "^0.22.17",
+    "typedoc-plugin-markdown": "^3.13.6",
+    "typedoc": "^0.23.0",
     "typescript": "^4.7.2"
   },
-  "dependencies": {
-    "penpal": "^6.2.1"
-  },
   "scripts": {
-    "build": "parcel build",
-    "build-docs": "typedoc ./src/PublisherInterface.ts",
-    "test": "node ./test/run_tests.js"
+    "build": ""
   }
 }
