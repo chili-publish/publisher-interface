@@ -7,6 +7,8 @@ The project is broken up into two directories:
 
 After building the script you will have a third folder called 📁 wiki, which contains the content that will be pushed to the github page.
 
+The `wiki` branch should **NEVER** be merged into the `main` branch.
+
 # Building The Wiki
 TODO
 
