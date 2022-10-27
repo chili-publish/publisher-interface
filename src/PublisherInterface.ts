@@ -137,13 +137,13 @@ export class PublisherInterface {
     return eventName;
   }
 
-  private _editorObject:EditorObjectAlias|null = null
+  #editorObject:EditorObjectAlias|null = null
   /**
    * Returns an alias for editorObject with similarly named functions. This is to help with backwards compatibility, but these functions still return a Promise.
    */
   get editorObject() {
-    if (this._editorObject == null) {
-      this._editorObject = {
+    if (this.#editorObject == null) {
+      this.#editorObject = {
           Alert: this.alert.bind(this),
           GetDirtyState: this.getDirtyState.bind(this),
           NextPage: this.nextPage.bind(this),
@@ -169,7 +169,7 @@ export class PublisherInterface {
         }
     }
 
-    return this._editorObject;
+    return this.#editorObject;
   }
 
   /**
