@@ -103,14 +103,13 @@ async function main() {
   playwrightChild.on("exit", (code) => {
     console.log(`child process exited with code ${code}`);
     //kill(serverChild.pid, "SIGTERM");
-    killAllTestServerProcess().then(() =>
-      exit(code)
-    );
+    killAllTestServerProcess();
+    exit(code);
   });
 }
 
 // On Ubuntu 22.04, testServer.js spawns two processes
-// Thus we go through and kill and all testServer process include rouge one
+// Thus we go through and kill and all testServer processs include rouge one
 async function killAllTestServerProcess() {
   const ps = await new Promise((res) => {
     exec("pgrep -f 'testServer.js'", (error, stdout, stderr) => {
