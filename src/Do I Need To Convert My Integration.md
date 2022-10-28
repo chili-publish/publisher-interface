@@ -1,17 +1,31 @@
-# What is happening?
-Due to an update to Chrome in January 2023, all CHILI integrations that utilize a subdomain trick and our JavaScript API will no longer function in January 2023. Eventually, this will be true of all Chromium browsers such as Edge, Opera, Brave, etc.
+# Does this affect me?
+|Our current configuration|What do I need to do?|
+|-|-|
+|We only use CHILI Publisher from the BackOffice|You do not have an integration so you will be unaffected|
+|We embed the editor on a webpage for our clients | If your integration interacts with the editor using JavaScript *and* you do **not** have a reverse proxy in place then you will be affected. Please see [Do I need to Convert My Integration](#doConvert) |
+|We have a reverse proxy implemented *or remaining from an on-prem installation*|By having a reverse proxy as a middleman server between your website and CHILI, the iframe domain will match your integration pages domain which is `same-origin` compliant; therefore, you will be unaffected.|
 
-Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome. This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
+<br />
+
+# <a name="happening">What is going on?</a>
+In an integration, the Publisher editor runs in a `<iframe>` tag, which means that the content loaded is subject to the [same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy). In short, this means that trying to interact with the CHILI Editor using JavaScript will cause the browser security to block the interaction if the domains do not match. This is intended to help keep the end-user secure by only allowing scripts from the same domain to be automatically executed in the browser of the end-user.
+
+To make it more clear, if my websites code tries to interact with a CHILI Editor from "chili-publish-sandbox.online" on my website "spicy-labs.com", my JavaScript will be blocked.
+
+Up until this change, you could utilize a *trick* to get around the same-origin policy by making sure you are loading the CHILI Editor from the same-origin using subdomains and setting the `document.domain` of the document (webpage) to be the same. This would allow your integration webpage and the iframe webpage to correctly fall under the `same-origin` policy and allow your code to interact with our editor.
+
+Due to an [update](https://developer.chrome.com/blog/immutable-document-domain/) to Chrome in January 2023, all CHILI integrations that utilize a subdomain trick and our JavaScript API will no longer function in January 2023. Eventually, this will be true of all [Chromium browsers](#chromium-browsers) such as Edge, Opera, Brave, etc.
+
+Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome (and other chromium based browsers). This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
 
 It is very important that you review your integration to confirm if you need to resolve this issue. Failure to do so could lead to unwanted loss of behavior in 2023. 
 
-<br/>
+<br />
 
-# Do I Need To Convert My Integration?
+# <a name="doConvert">Do I Need To Convert My Integration?</a>
 Short and simple:
 * If your integration of Publisher uses an `<iframe>`, our JavaScript API, and you are not utilizing a reverse proxy, then the answer is yes you need to convert.
 
-<br/>
 
 If you are not sure, there is a very simple test to see if you need to convert your integration. This test needs to be done inside your integration, it cannot be done in the BackOffice.
 
@@ -55,7 +69,7 @@ To convert over please read:
 <br/>
 
 # More FAQ
-
+<br />
 ## What if I am still not sure?
 Create a [support ticket](https://mysupport.chili-publish.com/) and one of our Client Success Engineers will help out. Keep in mind that the Client Success Engineer will need access to your integration to know if a switch to `PublisherConnector` is needed. This can be done via screen share or via a demo account if your integration is not publicly accessible.
 
@@ -104,7 +118,7 @@ We strongly suggest not using a reverse proxy, as you are just shifting resource
 <br/>
 
 ## Can we delay the date of January 2023?
-No, the date is set by Google, not CHILI publisher. There is nothing we can do to push the date back.
+No, the [date](https://developer.chrome.com/blog/immutable-document-domain/) is set by Google, not CHILI publisher. There is nothing we can do to push the date back.
 
 <br/>
 
@@ -117,3 +131,26 @@ We do not know that, and any prediction from Google will most likely change. In 
 Some time in or after January 2023, you or your clients will no longer be able to use any custom UI, UX, or workflows that rely on Publisher's JavaScript API. This is because Chrome browsers that have been updated will no longer be able to access the `editorObject`.
 
 You can read more about why here: [Why I Cannot Use editorObject](https://github.com/chili-publish/publisher-interface/wiki/Why-I-Cannot-Use-editorObject)
+
+<br />
+
+## <a name="affected-browsers">What browsers does this change affect?</a>
+Google [announced](https://developer.chrome.com/blog/immutable-document-domain/) that their next update of Chrome will prevent the `document.domain` property from being modified. It is *highly* probably that this will affect all [Chromium based browsers](#chromium-browsers) shortly after. Firefox may also implement this change in the near future. For maximum preparedness, we recommend all integrations using JavaScript migrate to our [PublisherInterface](https://github.com/chili-publish/publisher-interface/wiki/Moving-to-Publisher-Interface) library.
+
+<br />
+
+## <a name="chromium-browsers">What is a chromium based browser?</a>
+**Chromium** is web browser project (like a framework for building web browsers), mainly developed and maintained by Google. **Chrome** is a web browser developed by Google and is built on top of Chromium. Most of the "inner workings" and functionality of Chrome are dictated by Chromium.
+
+Since Chromium is open-source, other web browsers can use Chromium under the hood as well and build on top of it just like Google Chrome did. In fact, here is a list of popular browsers that currently do this:
+
+<!-- Begin browser list -->
+
+- Brave
+- Microsoft Edge
+- Opera
+- Vivaldi
+
+<!-- End browser list -->
+
+*To see a full list of Chromium based browsers, visit the [wiki](https://en.wikipedia.org/wiki/Chromium_(web_browser)#Browsers_based_on_Chromium)*
