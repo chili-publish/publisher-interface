@@ -1,51 +1,20 @@
 {
-  "name": "@chili-publish/publisher-connector",
-  "version": "0.1.0",
+  "name": "@chili-publish/publisher-interface-wiki",
+  "version": "0.x",
   "author": "chili-publish",
-  "description": "PublisherConnector is a class object that allows you to interact with the CHILI Publisher editorObject via postMessage without the complexity of postMessage.",
+  "description": "PublisherInterface is a class object that allows you to interact with the CHILI Publisher editorObject via postMessage without the complexity of postMessage.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/chili-publish/publisher-connector.git"
+    "url": "git://github.com/chili-publish/publisher-interface.git"
   },
+  "private": true,
   "license": "MIT",
-  "source": "./src/PublisherConnector.ts",
-  "main": "./dist/PublisherConnector.js",
-  "types": "./dist/PublisherConnector.d.ts",
-  "wrapper": "./distServer/chiliInternalWrapper.js",
-  "targets": {
-    "main": {
-      "sourceMap": false
-    },
-    "types": {
-      "sourceMap": false
-    },
-    "wrapper": {
-      "context": "browser",
-      "engines": {
-        "browsers": "last 2 Chrome version, last 2 Firefox version, last 2 Safari version, last 2 Edge version"
-      },
-      "outputFormat": "global",
-      "includeNodeModules": true,
-      "source": "./onServer/chiliInternalWrapper.ts"
-    }
-  },
-  "files": [
-    "dist/**"
-  ],
   "devDependencies": {
-    "@parcel/packager-ts": "^2.4.1",
-    "@parcel/transformer-typescript-types": "^2.4.1",
-    "@typescript-eslint/eslint-plugin": "^5.5.0",
-    "@typescript-eslint/parser": "^5.5.0",
-    "eslint": "^8.4.1",
-    "parcel": "^2.0.1",
-    "typedoc": "^0.22.14",
-    "typescript": "^4.5.2"
-  },
-  "dependencies": {
-    "penpal": "^6.2.1"
+    "typedoc-plugin-markdown": "^3.13.6",
+    "typedoc": "^0.23.0",
+    "typescript": "^4.7.2"
   },
   "scripts": {
-    "build": "parcel build"
+    "build": ""
   }
 }
