@@ -18,14 +18,14 @@ editorObject.ExecuteFunction("document", "save");
 
 💻 The interface way:
 ```javascript
-interface.executeFunction("document", "save");
+await interface.executeFunction("document", "save");
 ```
 
 <br/>
 
 There is a convenience getter on the `PublisherInterface` class named [editorObject](PublisherInterface.md#editorobject) which acts as an alias that can help current implementations switch to Publisher Interface.
 
-See [Converting an Integration](Converting-an-Integration.md) for more details.
+See [Moving to Publisher Connector](Moving-to-Publisher-Connector.md#dealing-with-publisherinterface-api-name-changes) for more details.
 
 ## Promise as a Return
 While the `editorObject` methods return by holding up the main thread, the `PublisherInterface` methods use `postMessage()` under the hood. This means that the message must be serialized, sent, and deserialized across from one window to another. It is a message system, and thus things happen asynchronously.
@@ -79,7 +79,7 @@ editorObject.AddListener("FrameMovedFinished");
 
 💻 The interface way:
 ```javascript
-interface.addListener("FrameMovedFinished");
+await interface.addListener("FrameMovedFinished");
 ```
 
 Both these implementations will call `window.OnEditorEvent()` method when the *FrameMovedFinished* event is fired off.
@@ -99,7 +99,7 @@ So our example can be rewritten as:
 
 💻 The interface way:
 ```javascript
-interface.addListener("FrameMovedFinished", (targetId) => {
+await interface.addListener("FrameMovedFinished", (targetId) => {
   console.log("Frame with id " + targetId + " was moved");
 });
 ```
@@ -114,5 +114,5 @@ editorObject.RemoveListener("FrameMovedFinished");
 
 💻 The interface way:
 ```javascript
-interface.removeListener("FrameMovedFinished");
+await interface.removeListener("FrameMovedFinished");
 ```
