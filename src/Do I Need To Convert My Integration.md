@@ -74,7 +74,7 @@ No, the problem is not about the Publisher editor loading, but instead any custo
 <br/>
 
 ## Will this switch require development work?
-Yes, it will require development work. The Publisher Interface library was built to be as close to the same as using `editorObject` as possible. However, due to the underline methodology provide by browsers, we had to make a major change in that workflow is now asynchronous.
+Yes, it will require development work. The Publisher Interface library was built to be as close to the same as using `editorObject` as possible. However, due to the underline methodology provided by browsers, we had to make a major change in that workflow that is now asynchronous.
 
 You can read more about it here: [Moving to Publisher Interface](https://github.com/chili-publish/publisher-interface/wiki/Moving-to-Publisher-Interface)
 
