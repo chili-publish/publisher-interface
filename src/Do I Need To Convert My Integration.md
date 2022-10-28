@@ -2,7 +2,7 @@
 |Our current configuration|What do I need to do?|
 |-|-|
 |We only use CHILI Publisher from the BackOffice|You do not have an integration so you will be unaffected|
-|We embed the editor on a webpage for our clients | If your integration interacts with the editor using JavaScript *and* you do **not** have a reverse proxy in place then you will be affected. Please see [Do I need to Convert My Integration](#doConvert) |
+|We embed the editor on a webpage for our clients | If your integration interacts with the editor using JavaScript *and* you do **not** have a reverse proxy in place then you will be affected. Please see [Do I need to Convert My Integration](#do-i-need-to-convert) |
 |We have a reverse proxy implemented *or remaining from an on-prem installation*|By having a reverse proxy as a middleman server between your website and CHILI, the iframe domain will match your integration pages domain which is `same-origin` compliant; therefore, you will be unaffected.|
 
 <br />
@@ -16,13 +16,13 @@ Up until this change, you could utilize a *trick* to get around the same-origin 
 
 Due to an [update](https://developer.chrome.com/blog/immutable-document-domain/) to Chrome in January 2023, all CHILI integrations that utilize a subdomain trick and our JavaScript API will no longer function in January 2023. Eventually, this will be true of all [Chromium browsers](#chromium-browsers) such as Edge, Opera, Brave, etc.
 
-Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome (and other chromium based browsers). This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
+Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome (and other [chromium based browsers]((#chromium-browsers))). This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
 
 It is very important that you review your integration to confirm if you need to resolve this issue. Failure to do so could lead to unwanted loss of behavior in 2023. 
 
 <br />
 
-# <a name="doConvert">Do I Need To Convert My Integration?</a>
+# <a name="do-i-need-to-convert">Do I Need To Convert My Integration?</a>
 Short and simple:
 * If your integration of Publisher uses an `<iframe>`, our JavaScript API, and you are not utilizing a reverse proxy, then the answer is yes you need to convert.
 
