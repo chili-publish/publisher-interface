@@ -16,7 +16,7 @@ Up until this change, you could utilize a *trick* to get around the same-origin 
 
 Due to an [update](https://developer.chrome.com/blog/immutable-document-domain/) to Chrome in January 2023, all CHILI integrations that utilize a subdomain trick and our JavaScript API will no longer function in January 2023. Eventually, this will be true of all [Chromium browsers](#chromium-browsers) such as Edge, Opera, Brave, etc.
 
-Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome (and other [chromium based browsers]((#chromium-browsers))). This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
+Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome (and other [chromium based browsers](#chromium-browsers)). This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
 
 It is very important that you review your integration to confirm if you need to resolve this issue. Failure to do so could lead to unwanted loss of behavior in 2023. 
 
