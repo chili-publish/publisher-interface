@@ -3,7 +3,7 @@ Well you can.
 
 When it comes to writing JavaScript in [Actions](https://chilipublishdocs.atlassian.net/wiki/spaces/CPDOC/pages/1412114/Variable+Document+Actions) or using the Console in Dev Tools, `editorObject` is still used.
 
-However, if you want to interact with Publisher via an `<iframe>`, you cannot access the `editorObject`. You can try, but the browser will block you due to [same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy).
+However, in an integration, the Publisher editor runs in a `<iframe>`, which means that the content loaded is subject to the [same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy). In short, this means that trying to interact with the CHILI Editor using JavaScript will cause the browser security to block the interaction if the domains do not match. This is intended to help keep the end-user secure by only allowing scripts from the same domain to be automatically executed in the browser of the end-user.
 
 ## Same-origin Policy
 It makes sense that the `editorObject` is inaccessible. An `<iframe>` is meant to open a website from another source inside of your website. Typically an `<iframe>` is used for adverts, or third-party applications. Realizing this, browser creators  recognized that a malicious hacker could, for example, include JavaScript in an advert designed to trick you into giving up personal information.
