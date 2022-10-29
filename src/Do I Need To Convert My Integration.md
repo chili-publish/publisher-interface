@@ -1,3 +1,12 @@
+# What is going on?
+Due to an update to Chrome in January 2023, all CHILI integrations that utilize a subdomain trick and our JavaScript API will no longer function in January 2023. Eventually, this will be true of all [Chromium browsers](#what-is-a-chromium-based-browser) such as Edge, Opera, Brave, etc.
+
+Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome (and other [chromium based browsers](#what-is-a-chromium-based-browser)). This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
+
+For a more technical explanation, please read: [Why I Cannot Use editorObject](https://github.com/chili-publish/publisher-interface/wiki/Why-I-Cannot-Use-editorObject).
+
+It is very important that you review your integration to confirm if you need to resolve this issue. Failure to do so could lead to unwanted loss of behavior in 2023.
+
 # Does this affect me?
 |Our current configuration|What do I need to do?|
 |-|-|
@@ -7,25 +16,10 @@
 
 <br />
 
-# <a name="happening">What is going on?</a>
-In an integration, the Publisher editor runs in a `<iframe>` tag, which means that the content loaded is subject to the [same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy). In short, this means that trying to interact with the CHILI Editor using JavaScript will cause the browser security to block the interaction if the domains do not match. This is intended to help keep the end-user secure by only allowing scripts from the same domain to be automatically executed in the browser of the end-user.
+# What if I am affected?
+Short and simple: If your integration of Publisher uses an `<iframe>`, our JavaScript API, and you are not utilizing a reverse proxy, then you will need to convert to Publisher Interface.
 
-To make it more clear, if my websites code tries to interact with a CHILI Editor from "chili-publish-sandbox.online" on my website "spicy-labs.com", my JavaScript will be blocked.
-
-Up until this change, you could utilize a *trick* to get around the same-origin policy by making sure you are loading the CHILI Editor from the same-origin using subdomains and setting the `document.domain` of the document (webpage) to be the same. This would allow your integration webpage and the iframe webpage to correctly fall under the `same-origin` policy and allow your code to interact with our editor.
-
-Due to an [update](https://developer.chrome.com/blog/immutable-document-domain/) to Chrome in January 2023, all CHILI integrations that utilize a subdomain trick and our JavaScript API will no longer function in January 2023. Eventually, this will be true of all [Chromium browsers](#chromium-browsers) such as Edge, Opera, Brave, etc.
-
-Specifically, what will happen in January 2023 is that all JavaScript API calls made with `editorObject` will be blocked by Chrome (and other [chromium based browsers](#chromium-browsers)). This will cause custom UI, UX, and workflows relying on Publisher's JavaScript API to fail. So the Publisher editor will still load and function, but the custom integration will not be able to communicate with the editor.
-
-It is very important that you review your integration to confirm if you need to resolve this issue. Failure to do so could lead to unwanted loss of behavior in 2023. 
-
-<br />
-
-# <a name="do-i-need-to-convert">Do I Need To Convert My Integration?</a>
-Short and simple:
-* If your integration of Publisher uses an `<iframe>`, our JavaScript API, and you are not utilizing a reverse proxy, then the answer is yes you need to convert.
-
+To help with conversion, please read: [Moving to Publisher Interface](https://github.com/chili-publish/publisher-interface/wiki/Moving-to-Publisher-Interface)
 
 If you are not sure, there is a very simple test to see if you need to convert your integration. This test needs to be done inside your integration, it cannot be done in the BackOffice.
 
@@ -134,12 +128,12 @@ You can read more about why here: [Why I Cannot Use editorObject](https://github
 
 <br />
 
-## <a name="affected-browsers">What browsers does this change affect?</a>
-Google [announced](https://developer.chrome.com/blog/immutable-document-domain/) that their next update of Chrome will prevent the `document.domain` property from being modified. It is *highly* probably that this will affect all [Chromium based browsers](#chromium-browsers) shortly after. Firefox may also implement this change in the near future. For maximum preparedness, we recommend all integrations using JavaScript migrate to our [PublisherInterface](https://github.com/chili-publish/publisher-interface/wiki/Moving-to-Publisher-Interface) library.
+## What browsers does this change affect?
+Google [announced](https://developer.chrome.com/blog/immutable-document-domain/) that their next update of Chrome will prevent the `document.domain` property from being modified. It is *highly* probably that this will affect all [Chromium based browsers](#what-is-a-chromium-based-browser) shortly after. Firefox may also implement this change in the near future. For maximum preparedness, we recommend all integrations using JavaScript migrate to our [PublisherInterface](https://github.com/chili-publish/publisher-interface/wiki/Moving-to-Publisher-Interface) library.
 
 <br />
 
-## <a name="chromium-browsers">What is a chromium based browser?</a>
+## What is a chromium based browser?
 **Chromium** is web browser project (like a framework for building web browsers), mainly developed and maintained by Google. **Chrome** is a web browser developed by Google and is built on top of Chromium. Most of the "inner workings" and functionality of Chrome are dictated by Chromium.
 
 Since Chromium is open-source, other web browsers can use Chromium under the hood as well and build on top of it just like Google Chrome did. In fact, here is a list of popular browsers that currently do this:
