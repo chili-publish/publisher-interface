@@ -120,7 +120,7 @@ export type buildOptions = {
   /**
    * Pass in an array of events that will be auto-added via `addListener()`
    */
-  events?:string|{name:string, func?:(targetId: string) => void}[]
+  events?:(string|{name:string, func?:(targetId: string) => void})[]
 }
 
 export class PublisherInterface {
