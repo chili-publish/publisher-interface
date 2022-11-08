@@ -276,12 +276,41 @@ The `OnGetApiKey()` function really did nothing to hide the API key, as the key 
 <br/>
 
 ## Self Hosted
-If you are using CHILI publish Online, then there is no concerns. If you are on an older self hosted CHILI publish, then you will need two things:
+If you are on an older self-hosted CHILI publish, then you will need two things:
 * Be on the latest version of CHILI 6
-* Set the below environment variable and restart your IIS server
+* Edit editor_html.aspx
 
-```
-ChiliWeb_XssTrackerScript=https://unpkg.com/@chili-publish/publisher-interface@0.3.0/dist/chiliInternalWrapper.min.js
+<br/>
+
+### Latest Version
+If you try to set this up on a self-hosted version that is too old, everything will work except for the event system via `addListener`.
+
+So please make sure you are on the latest version of CHILI.
+
+<br/>
+
+### Edit
+Find your editor_html.aspx file, which is typically located at _C:\CHILI_Publisher\app\editor_html.aspx_, but you can always look up the path in your IIS settings.
+
+Once you find the file, open it in an editor, and go down to the very end of `</body>`.
+
+Before the close tag `</body>`, add this script tag:
+```html
+<script type="text/javascript" src="https://unpkg.com/@chili-publish/publisher-interface@latest/dist/chiliInternalWrapper.min.js"></script>
 ```
 
-If the environment variable does not work for you, you can install the script manually. See the [onServer README](https://github.com/chili-publish/publisher-interface/blob/main/onServer/README.md)
+Therefore, your `editor_html.aspx` should end like this:
+```html
+    </div>
+	<script type="text/javascript" src="https://unpkg.com/@chili-publish/publisher-interface@latest/dist/chiliInternalWrapper.min.js"></script>
+</body>
+</html>
+```
+
+If you do not want to or cannot use unpkg, you can build the script yourself. See [onServer README](https://github.com/chili-publish/publisher-interface/blob/main/onServer/README.md) for more information.
+
+<br/>
+
+There are two things to take note:
+* You will need to edit the `editor_html.aspx` after every update. We may potentially include a script that will make this easier.
+* You will know it is working because you can find unpkg in the `Sources` of all Chromium based browser.
