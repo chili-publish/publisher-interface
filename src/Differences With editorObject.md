@@ -87,7 +87,7 @@ Both these implementations will call `window.OnEditorEvent()` method when the *F
 So you could use something like the below example in both cases to log when *FrameMovedFinished* event is fired off.
 ```javascript
 window.OnEditorEvent = (eventName, targetId) => {
-  if (eventName == "FrameMovedFinished) {
+  if (eventName == "FrameMovedFinished") {
     console.log("Frame with id " + targetId + " was moved");
   }
 }
