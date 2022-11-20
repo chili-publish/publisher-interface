@@ -30,10 +30,10 @@ function logDocName() {
 }
 ```
 
-💻 The interface way returns a Promise which we can handle with a callbacks
+💻 The publisher way returns a Promise which we can handle with a callbacks
 ```javascript
 function logDocName() {
-  interface.getObject("document.id").then(
+  publisher.getObject("document.id").then(
       documentId => console.log(documentId)
   );
 }
@@ -42,7 +42,7 @@ function logDocName() {
 or wrapped in an `async` function:
 ```javascript
 async function logDocName() {
-  const documentId = await interface.getObject("document.id");
+  const documentId = await publisher.getObject("document.id");
   console.log(documentId);
 }
 ```
@@ -148,24 +148,24 @@ As you read in [Differences With editorObject](https://github.com/chili-publish/
 editorObject.ExecuteFunction("document", "save");
 ```
 
-💻 The interface way:
+💻 The publisher way:
 ```javascript
-await interface.executeFunction("document", "save");
+await publisher.executeFunction("document", "save");
 ```
 
 <br/>
 
 There is a convenience getter on the `PublisherInterface` class named [editorObject](PublisherInterface.md#editorobject) which acts as an alias that can help current implementations switch to Publisher Interface.
 
-Using the getter we could rewrite our interface example as: 
+Using the getter we could rewrite our publisher example as: 
 ```javascript
-await interface.editorObject.ExecuteFunction("document", "save");
+await publisher.editorObject.ExecuteFunction("document", "save");
 ```
 
 If your integration has lots of method calls to the `editorObject` then this getter can be used to save some modification time. You can even capture this in a variable called *editorObject* or *editor* to then pass onto your code.
 
 ```javascript
-const editorObject = interface.editorObject
+const editorObject = publisher.editorObject
 await editorObject.ExecuteFunction("document", "save");
 ```
 
@@ -199,7 +199,7 @@ Good news, nothing changes besides the fact that `addListener()` returns a Promi
 
 So, this works as expected:
 ```javascript
-await interface.addListener("FrameMovedFinished");
+await publisher.addListener("FrameMovedFinished");
 ```
 
 <br/>
@@ -234,9 +234,9 @@ function beforeIFrameLoaded() {
   PublisherConnector.build(iframe).then(myCallback);
 }
 
-function myCallback(interface)
+function myCallback(publisher)
 {
-  // Do something with interface
+  // Do something with publisher
 }
 ```
 
@@ -246,13 +246,13 @@ Again, it might make more sense to use async/await
 // This must be done before iframe onload event
 function beforeIFrameLoaded() {
   iframe = document.getElementById("chili-iframe");
-  const interface = await PublisherConnector.build(iframe);
-  myCallback(interface);
+  const publisher = await PublisherConnector.build(iframe);
+  myCallback(publisher);
 }
 
-function myCallback(interface)
+function myCallback(publisher)
 {
-  // Do something with interface
+  // Do something with publisher
 }
 ```
 

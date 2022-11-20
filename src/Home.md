@@ -16,9 +16,9 @@ You can find complete documentation on the [wiki](https://github.com/chili-publi
 
 * [Installation](#installation) - Easy npm install.
 * [Getting Started](#getting-started) - A very quick tutorial to get you started.
+* [Integrating Publisher](https://github.com/chili-publish/publisher-interface/wiki/Integrating-Publisher) - A much longer tutorial for those starting a new project with Publisher.
 * [Why I Cannot Use editorObject](https://github.com/chili-publish/publisher-interface/wiki/Why-I-Cannot-Use-editorObject) - A description of why `editorObject` can no longer be used when communicating with an `<iframe>`.
 * [Differences With editorObject](https://github.com/chili-publish/publisher-interface/wiki/Differences-With-editorObject) - All the differences between `PublisherInterface` and `editorObject`.
-* [Integrating Publisher](https://github.com/chili-publish/publisher-interface/wiki/Integrating-Publisher) - A much longer tutorial for those starting a new project with Publisher.
 * [Moving to Publisher Interface](https://github.com/chili-publish/publisher-interface/wiki/Moving-to-Publisher-Interface) - A guide for those who already have a project with Publisher and are now converting their current integration from `editorObject` to Publisher Interface.
 * [Big List of JavaScript Use Cases](https://github.com/chili-publish/publisher-interface/wiki/Big-List-of-JavaScript-Use-Cases) - A very long list of JavaScript use cases. [WIP]
 * [API Documentation](https://github.com/chili-publish/publisher-interface/wiki/API-Docs) - auto-generated documentation of the `PublisherInterface` class and associated types. Even though it is auto-generated, the comments therein were written with insight.
@@ -76,7 +76,7 @@ Then in your JavaScript code, get the iframe which is loading the Publisher edit
 
 ```javascript
 const iframe = document.getElementById("editor-iframe");
-const interface = PublisherInterface.build(iframe).then(
+const publisher = PublisherInterface.build(iframe).then(
     PublisherInterface => PublisherInterface.alert("Hi!")
 );
 ```
@@ -96,8 +96,8 @@ Here is a complete example:
         const iframe = document.getElementById("editor-iframe");
     
         (async () => {
-            const interface = await PublisherInterface.build(iframe);
-            const documentName = await interface.getObject("document.name");
+            const publisher = await PublisherInterface.build(iframe);
+            const documentName = await publisher.getObject("document.name");
             console.log(documentName);
         })();
     </script>
