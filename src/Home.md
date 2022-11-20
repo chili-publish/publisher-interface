@@ -76,7 +76,7 @@ Then in your JavaScript code, get the iframe which is loading the Publisher edit
 
 ```javascript
 const iframe = document.getElementById("editor-iframe");
-const interface = PublisherInterface.build(iframe).then(
+const publisher = PublisherInterface.build(iframe).then(
     PublisherInterface => PublisherInterface.alert("Hi!")
 );
 ```
@@ -96,8 +96,8 @@ Here is a complete example:
         const iframe = document.getElementById("editor-iframe");
     
         (async () => {
-            const interface = await PublisherInterface.build(iframe);
-            const documentName = await interface.getObject("document.name");
+            const publisher = await PublisherInterface.build(iframe);
+            const documentName = await publisher.getObject("document.name");
             console.log(documentName);
         })();
     </script>

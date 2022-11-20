@@ -16,9 +16,9 @@ A small, but important difference is that the methods from the `PublisherInterfa
 editorObject.ExecuteFunction("document", "save");
 ```
 
-💻 The interface way:
+💻 The publisher way:
 ```javascript
-await interface.executeFunction("document", "save");
+await publisher.executeFunction("document", "save");
 ```
 
 <br/>
@@ -42,10 +42,10 @@ function logDocName() {
 }
 ```
 
-💻 The interface way:
+💻 The publisher way:
 ```javascript
 function logDocName() {
-  interface.getObject("document.id").then(
+  publisher.getObject("document.id").then(
       documentId => console.log(documentId)
   );
 }
@@ -54,7 +54,7 @@ function logDocName() {
 or
 ```javascript
 async function logDocName() {
-  const documentId = await interface.getObject("document.id");
+  const documentId = await publisher.getObject("document.id");
   console.log(documentId);
 }
 ```
@@ -77,9 +77,9 @@ The good news is that `PublisherInterface` behave the same.
 editorObject.AddListener("FrameMovedFinished");
 ```
 
-💻 The interface way:
+💻 The publisher way:
 ```javascript
-await interface.addListener("FrameMovedFinished");
+await publisher.addListener("FrameMovedFinished");
 ```
 
 Both these implementations will call `window.OnEditorEvent()` method when the *FrameMovedFinished* event is fired off.
@@ -97,9 +97,9 @@ However, with the `PublisherInterface` there more concise way to handle events u
 
 So our example can be rewritten as:
 
-💻 The interface way:
+💻 The publisher way:
 ```javascript
-await interface.addListener("FrameMovedFinished", (targetId) => {
+await publisher.addListener("FrameMovedFinished", (targetId) => {
   console.log("Frame with id " + targetId + " was moved");
 });
 ```
@@ -112,7 +112,7 @@ Removing events is the same in both implementations.
 editorObject.RemoveListener("FrameMovedFinished");
 ```
 
-💻 The interface way:
+💻 The publisher way:
 ```javascript
-await interface.removeListener("FrameMovedFinished");
+await publisher.removeListener("FrameMovedFinished");
 ```
