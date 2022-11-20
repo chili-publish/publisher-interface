@@ -277,15 +277,17 @@ The `OnGetApiKey()` function really did nothing to hide the API key, as the key 
 
 ## Self Hosted
 If you are on an older self-hosted CHILI publish, then you will need two things:
-* Be on the latest version of CHILI 6
+* Be on a version of CHILI Publish greater than 6.5.5
 * Edit editor_html.aspx
 
 <br/>
 
 ### Latest Version
-If you try to set this up on a self-hosted version that is too old, everything will work except for the event system via `addListener`.
+Due to some code modifications required within the application to support the PublisherInterface, if you attempt to use this package on a self-hosted version of CHILI older than version 6.5.5, then everything will work *except* for the event system via `addListener`.
 
-So please make sure you are on the latest version of CHILI.
+In order to avoid this, please make sure your CHILI version is greater than 6.5.5. You are able to find the latest downloads [here](https://mysupport.chili-publish.com/hc/en-us/articles/360021250259-Latest-downloads). 
+
+We also have an article on our support website with information about updating your CHILI installation located [here](https://mysupport.chili-publish.com/hc/en-us/articles/4405609364370-Safe-Update)
 
 <br/>
 
