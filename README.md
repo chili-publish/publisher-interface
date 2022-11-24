@@ -27,7 +27,7 @@ You can find complete documentation on the [wiki](https://github.com/chili-publi
 You can install PublisherInterface via npm
 
 ```
-npm i @chili-publish/publisher-interface
+npm install @chili-publish/publisher-interface
 ```
 
 <br/>
