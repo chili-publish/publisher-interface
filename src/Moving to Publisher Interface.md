@@ -145,12 +145,12 @@ As you read in [Differences With editorObject](https://github.com/chili-publish/
 
 ✏️ The editorObject way:
 ```javascript
-editorObject.ExecuteFunction("document", "save");
+editorObject.ExecuteFunction("document", "Save");
 ```
 
 💻 The publisher way:
 ```javascript
-await publisher.executeFunction("document", "save");
+await publisher.executeFunction("document", "Save");
 ```
 
 <br/>
@@ -159,14 +159,14 @@ There is a convenience getter on the `PublisherInterface` class named [editorObj
 
 Using the getter we could rewrite our publisher example as: 
 ```javascript
-await publisher.editorObject.ExecuteFunction("document", "save");
+await publisher.editorObject.ExecuteFunction("document", "Save");
 ```
 
 If your integration has lots of method calls to the `editorObject` then this getter can be used to save some modification time. You can even capture this in a variable called *editorObject* or *editor* to then pass onto your code.
 
 ```javascript
 const editorObject = publisher.editorObject
-await editorObject.ExecuteFunction("document", "save");
+await editorObject.ExecuteFunction("document", "Save");
 ```
 
 There is one danger in using this convenience getter. That danger is you forget about the `async` keyword. This convenience getter does not magically make Promises into original values. The way Publisher Interface uses a message system means that getting rid of callbacks or async/await is not possible.
