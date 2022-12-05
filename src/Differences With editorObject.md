@@ -13,12 +13,12 @@ A small, but important difference is that the methods from the `PublisherInterfa
 
 ✏️ The editorObject way:
 ```javascript
-editorObject.ExecuteFunction("document", "save");
+editorObject.ExecuteFunction("document", "Save");
 ```
 
 💻 The publisher way:
 ```javascript
-await publisher.executeFunction("document", "save");
+await publisher.executeFunction("document", "Save");
 ```
 
 <br/>
