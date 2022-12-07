@@ -246,7 +246,7 @@ Again, it might make more sense to use async/await
 // This must be done before iframe onload event
 function beforeIFrameLoaded() {
   iframe = document.getElementById("chili-iframe");
-  const publisher = await PublisherInterfacer.build(iframe);
+  const publisher = await PublisherInterface.build(iframe);
   myCallback(publisher);
 }
 
