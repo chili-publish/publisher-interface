@@ -231,7 +231,7 @@ The best suggestion is to rework your logic around the waiting for the `build()`
 // This must be done before iframe onload event
 function beforeIFrameLoaded() {
   iframe = document.getElementById("chili-iframe");
-  PublisherConnector.build(iframe).then(myCallback);
+  PublisherInterface.build(iframe).then(myCallback);
 }
 
 function myCallback(publisher)
@@ -246,7 +246,7 @@ Again, it might make more sense to use async/await
 // This must be done before iframe onload event
 function beforeIFrameLoaded() {
   iframe = document.getElementById("chili-iframe");
-  const publisher = await PublisherConnector.build(iframe);
+  const publisher = await PublisherInterfacer.build(iframe);
   myCallback(publisher);
 }
 
