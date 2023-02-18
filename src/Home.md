@@ -118,6 +118,7 @@ However, in larger applications, to ensure the iframe and the build method are c
         iframe.src = "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G07gMFMq07X+SG2o8KlW8oAeZGqoB1a0YkbeZU1wJK15aIhANgZmhg+13NQlxpBEq7Q==";
         const publisherPromise = PublisherInterface.build(iframe);
         document.body.appendChild(iframe);
+        const publisher = await publisherPromise;
         const documentName = await publisher.getObject("document.name");
         console.log(documentName);
       })();
