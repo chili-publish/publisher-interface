@@ -76,8 +76,8 @@ Then in your JavaScript code, get the iframe which is loading the Publisher edit
 
 ```javascript
 const iframe = document.getElementById("editor-iframe");
-const publisher = PublisherInterface.build(iframe).then(
-    PublisherInterface => PublisherInterface.alert("Hi!")
+PublisherInterface.build(iframe).then(
+    publisher => publisher.alert("Hi!")
 );
 ```
 
