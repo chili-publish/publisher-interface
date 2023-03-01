@@ -105,7 +105,14 @@ In simple use cases, the below example will work well.
 ```
 
 <br/>
-However, in larger applications, to ensure the iframe and the build method are called in the same JavaScript event loop, you can create the iframe and set its src, then call build and capture its promise, before finally appending the iframe and awaiting the captured promise.
+When dealing with larger applications, it's important to ensure that the `iframe` and the `PublisherInterface` build method are called in the same JavaScript event loop. To do this, follow these steps:
+
+1. Create the `iframe` element and set its `src` attribute.
+2. Pass the `iframe` element to the `build` method of `PublisherInterface` and capture the promise returned from the method.
+3. Append the `iframe` element to the DOM.
+4. Await the promise captured in step 2 and assign it to a variable that can be used throughout your application.
+
+Example Code:
 
 ```html
 <body>
@@ -133,7 +140,7 @@ To enable debugging for the underlying library, pass {penpalDebug: true} as the 
 PublisherInterface.build(iframe, {penpalDebug: true});
 ```
 
-This will display messages in the console about Penpal and the communication between the iframe and the main page.
+This will display messages in the console from Penpal and the communication between the iframe and the main page.
 
 If there's a possibility of a failure to connect, you can set a timeout. If the connection is not established before the timeout, an exception will be thrown. In the example below, the build method will throw a timeout after 10 seconds if no connection is established.
 ```javascript
