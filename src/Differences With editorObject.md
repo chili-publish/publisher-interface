@@ -13,19 +13,19 @@ A small, but important difference is that the methods from the `PublisherInterfa
 
 ✏️ The editorObject way:
 ```javascript
-editorObject.ExecuteFunction("document", "save");
+editorObject.ExecuteFunction("document", "Save");
 ```
 
 💻 The publisher way:
 ```javascript
-await publisher.executeFunction("document", "save");
+await publisher.executeFunction("document", "Save");
 ```
 
 <br/>
 
 There is a convenience getter on the `PublisherInterface` class named [editorObject](PublisherInterface.md#editorobject) which acts as an alias that can help current implementations switch to Publisher Interface.
 
-See [Moving to Publisher Connector](Moving-to-Publisher-Connector.md#dealing-with-publisherinterface-api-name-changes) for more details.
+See [Moving to Publisher Interface](Moving-to-Publisher-Connector.md#dealing-with-publisherinterface-api-name-changes) for more details.
 
 ## Promise as a Return
 While the `editorObject` methods return by holding up the main thread, the `PublisherInterface` methods use `postMessage()` under the hood. This means that the message must be serialized, sent, and deserialized across from one window to another. It is a message system, and thus things happen asynchronously.
