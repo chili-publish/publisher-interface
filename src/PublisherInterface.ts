@@ -389,7 +389,7 @@ export class PublisherInterface {
    * @example
    * // Will add a new frame of type text on page of index 0 at coordinates X: 10 mm and Y: 15 mm with width: 100 mm and height: 50 mm
    * ```ts
-   * publisherInterface.ExecuteFunction('document.pages[0].frames', 'Add', 'text', '10 mm', '15 mm', '100 mm', '50 mm');
+   * publisherInterface.executeFunction('document.pages[0].frames', 'Add', 'text', '10 mm', '15 mm', '100 mm', '50 mm');
    * ```
    * @param chiliPath - A case-sensitive string query path for selecting properties and objects in a CHILI document.
    * @param functionName - A case-sensitive string of the name of the function to execute.
@@ -418,7 +418,7 @@ export class PublisherInterface {
    * @example
    * ```ts
    * \\ This will get a 1000 by 1000 image of the first page and open it in a popup.
-   * let base64 = publisherInterface.GetPageSnapshot('0', '1000x1000', null, null, 'preview', true);
+   * let base64 = publisherInterface.getPageSnapshot('0', '1000x1000', null, null, 'preview', true);
    *
    * let newImage = new Image();
    * newImage.src = "data:image/png;base64," + base64;
