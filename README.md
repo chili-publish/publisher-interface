@@ -140,7 +140,7 @@ To enable debugging for the underlying library, pass {penpalDebug: true} as the 
 PublisherInterface.build(iframe, {penpalDebug: true});
 ```
 
-This will display messages in the console from Penpal and the communication between the iframe and the main page.
+This will display messages in the console from Penpal about the communication between the iframe and the main page.
 
 If there's a possibility of a failure to connect, you can set a timeout. If the connection is not established before the timeout, an exception will be thrown. In the example below, the build method will throw a timeout after 10 seconds if no connection is established.
 ```javascript
