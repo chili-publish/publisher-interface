@@ -6,6 +6,10 @@ export default async function (createInterface) {
     publisherInterface.addListener("DocumentFullyLoaded", resolve)
   );
 
+  if (publisherInterface.executeFunction != publisherInterface.editorObject.ExecuteFunction) {
+    return false;
+  }
+
   const count = await publisherInterface.getObject("document.variables.count");
 
   const newVariable = await publisherInterface.executeFunction(
