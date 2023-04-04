@@ -155,7 +155,9 @@ export class PublisherInterface {
     }).promise;
 
     publisherInterface.debug = options.penpalDebug ?? false;
+
     publisherInterface.creationTime = new Date().toLocaleString();
+    publisherInterface.createDebugLog("build()");
 
     const events = options.events;
 
@@ -180,7 +182,7 @@ export class PublisherInterface {
   }
 
   /**
-   * Logs a function event if penpalDebug is enabled
+   * Logs a function call creation if penpalDebug is enabled
    * @param functionName The name of the function being executed
    */
   private createDebugLog(functionName: string) {
