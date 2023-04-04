@@ -1,4 +1,4 @@
-export default async function (createInterface) {
+export default async function addListener(createInterface) {
 
   const publisherInterface = await createInterface();
 
