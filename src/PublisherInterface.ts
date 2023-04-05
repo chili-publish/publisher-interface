@@ -114,9 +114,9 @@ export type buildOptions = {
    */
   timeout?: number,
   /**
-   * If true, the underlining library penpal will log debug info in the console. Useful for debugging connection issues.
+   * If true, PublisherInterface and the underlining library penpal will log debug info in the console. Useful for debugging connection issues.
    */
-  penpalDebug?:boolean, 
+  penpalDebug?: boolean,
   /**
    * Pass in an array of events that will be auto-added via `addListener()`
    */
@@ -127,6 +127,8 @@ export class PublisherInterface {
   private child!: AsyncMethodReturns<ChiliWrapper>;
   private chiliEventListenerCallbacks: Map<string, (targetId: string) => void> =
       new Map<string, (targetId: string) => void>();
+  private debug = false;
+  private creationTime = "";
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {
@@ -134,8 +136,8 @@ export class PublisherInterface {
 
   /**
    * The build method will wait for a connection to the other side of iframe. Must be called before iframe `onload` event is fired.
-   * 
-   * @param iframe 
+   *
+   * @param iframe
    * @param options
    * @returns {PublisherInterface}
    */
@@ -151,6 +153,11 @@ export class PublisherInterface {
       timeout: options.timeout,
       debug: options.penpalDebug
     }).promise;
+
+    publisherInterface.debug = options.penpalDebug ?? false;
+
+    publisherInterface.creationTime = new Date().toLocaleString();
+    publisherInterface.createDebugLog("build()");
 
     const events = options.events;
 
@@ -172,6 +179,16 @@ export class PublisherInterface {
     this.chiliEventListenerCallbacks.has(eventName) &&
       this.chiliEventListenerCallbacks.get(eventName)?.(id);
     return eventName;
+  }
+
+  /**
+   * Logs a function call creation if penpalDebug is enabled
+   * @param functionName The name of the function being executed
+   */
+  private createDebugLog(functionName: string) {
+    if (this.debug) {
+      console.log(`[PublisherInterface - ${this.creationTime}]`, `Creating ${functionName} call request`);
+    }
   }
 
   #editorObject:EditorObjectAlias|null = null
@@ -216,6 +233,7 @@ export class PublisherInterface {
    * @param title - The title/header of the modal.
    */
   public async alert(message: string, title: string): Promise<void> {
+    this.createDebugLog("alert()");
     const response = await this.child.alert(message, title);
     if (response.isError) {
       throw new Error(response.error)
@@ -228,11 +246,11 @@ export class PublisherInterface {
    * @returns Returns boolean to signify if the document has been changed since previous save.
    */
   public async getDirtyState(): Promise<boolean> {
+    this.createDebugLog("getDirtyState()");
     const response = await this.child.getDirtyState();
     if (response.isError) {
       throw new Error(response.error)
     }
-
     return response.ok;
   }
 
@@ -241,6 +259,7 @@ export class PublisherInterface {
    * If the current selected page has the beginning index 0 then nothing happens.
    */
   public async nextPage(): Promise<void> {
+    this.createDebugLog("nextPage()");
     const response = await this.child.nextPage();
     if (response.isError) {
       throw new Error(response.error)
@@ -252,6 +271,7 @@ export class PublisherInterface {
    * If the current selected page has the last index then nothing happens.
    */
   public async previousPage(): Promise<void> {
+    this.createDebugLog("previousPage()");
     const response = await this.child.previousPage();
     if (response.isError) {
       throw new Error(response.error)
@@ -264,6 +284,7 @@ export class PublisherInterface {
    * @param page - Common language page number (page index + 1) to select.
    */
   public async setSelectedPage(page: number): Promise<void> {
+    this.createDebugLog("setSelectedPage()");
     const response = await this.child.setSelectedPage(page);
     if (response.isError) {
       throw new Error(response.error)
@@ -277,6 +298,7 @@ export class PublisherInterface {
    * @returns Page index + 1 of the selected page.
    */
   public async getSelectedPage(): Promise<number> {
+    this.createDebugLog("getSelectedPage()");
     const response = await this.child.getSelectedPage();
     if (response.isError) {
       throw new Error(response.error)
@@ -290,6 +312,7 @@ export class PublisherInterface {
    * @returns Name of the page.
    */
   public async getSelectedPageName(): Promise<string> {
+    this.createDebugLog("getSelectedPageName()");
     const response = await this.child.getSelectedPageName();
     if (response.isError) {
       throw new Error(response.error)
@@ -303,6 +326,7 @@ export class PublisherInterface {
    * @returns The total number of pages.
    */
   public async getNumPages(): Promise<number> {
+    this.createDebugLog("getNumPages()");
     const response = await this.child.getNumPages();
     if (response.isError) {
       throw new Error(response.error)
@@ -316,6 +340,7 @@ export class PublisherInterface {
    * @param eventName - A case-sensitive string representing the editor event type to stop listening to.
    */
   public async removeListener(eventName: string): Promise<void> {
+    this.createDebugLog("removeListener()");
     this.chiliEventListenerCallbacks.delete(eventName);
     const response = await this.child.removeListener(eventName);
     if (response.isError) {
@@ -338,11 +363,12 @@ export class PublisherInterface {
     eventName: string,
     callbackFunction?: (targetId: string) => void
   ): Promise<void> {
-    
+
+    this.createDebugLog("addListener()");
     this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetId) => {
       if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetId)
     } : callbackFunction)
-    
+
     const response = await this.child.addListener(eventName);
     if (response.isError) {
       throw new Error(response.error)
@@ -358,12 +384,18 @@ export class PublisherInterface {
   public async getObject(
     chiliPath: string
   ): Promise<string | number | boolean | object | null | undefined> {
+    this.createDebugLog("getObject()");
     const response = await this.child.getObject(chiliPath);
     if (response.isError) {
       throw new Error(response.error)
     }
     return response.ok;
   }
+
+  /**
+   * Make getProperty an alias for getObject
+   */
+  public getProperty = this.getObject;
 
   /**
    * Sets the value of the property defined by property on the object defined by the chiliPath
@@ -377,6 +409,7 @@ export class PublisherInterface {
     property: string,
     value: string | number | boolean | null
   ): Promise<void> {
+    this.createDebugLog("setProperty()");
     const response = await this.child.setProperty(chiliPath, property, value);
     if (response.isError) {
       throw new Error(response.error)
@@ -401,6 +434,7 @@ export class PublisherInterface {
     functionName: string,
     ...params: (string | number | boolean | null | undefined)[]
   ): Promise<string | number | boolean | object | null | undefined> {
+    this.createDebugLog("executeFunction()");
     const response = await this.child.executeFunction(
       chiliPath,
       functionName,
@@ -443,6 +477,7 @@ export class PublisherInterface {
     viewMode: "preview" | "edit" | "technical",
     transparentBackground: boolean
   ): Promise<string> {
+    this.createDebugLog("getPageSnapshot()");
     const response = await this.child.getPageSnapshot(
       pageIndex,
       size,
@@ -470,6 +505,7 @@ export class PublisherInterface {
     size: string | { width: number; height: number } | number,
     transparentBackground: boolean
   ): Promise<string> {
+    this.createDebugLog("getFrameSnapshot()");
     const response = await this.child.getFrameSnapshot(
       idOrTag,
       size,
@@ -490,6 +526,7 @@ export class PublisherInterface {
   public async getFrameSubjectArea(
     idOrTag: string
   ): Promise<{ height: string; width: string; x: string; y: string }> {
+    this.createDebugLog("getFrameSubjectArea()");
     const response = await this.child.getFrameSubjectArea(idOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -513,6 +550,7 @@ export class PublisherInterface {
     width: number,
     height: number
   ): Promise<void> {
+    this.createDebugLog("setFrameSubjectArea()");
     const response = await this.child.setFrameSubjectArea(
       idOrTag,
       x,
@@ -531,6 +569,7 @@ export class PublisherInterface {
    * @param idOrTag - The string id or tag of the frame to clear the subject area.
    */
   public async clearFrameSubjectArea(idOrTag: string): Promise<void> {
+    this.createDebugLog("clearFrameSubjectArea()");
     const response = await this.child.clearFrameSubjectArea(idOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -551,6 +590,7 @@ export class PublisherInterface {
     poiX: string;
     poiY: string;
   }> {
+    this.createDebugLog("getAssetSubjectInfo()");
     const response = await this.child.getAssetSubjectInfo(frameIdOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -578,6 +618,7 @@ export class PublisherInterface {
     poiX: number,
     poiY: number
   ): Promise<void> {
+    this.createDebugLog("setAssetSubjectInfo()");
     const response = await this.child.setAssetSubjectInfo(
       frameIdOrTag,
       x,
@@ -598,6 +639,7 @@ export class PublisherInterface {
    * @param frameIdOrTag - The string id or tag of the frame to clear the asset subject area.
    */
   public async clearAssetSubjectInfo(frameIdOrTag: string): Promise<void> {
+    this.createDebugLog("clearAssetSubjectInfo()");
     const response = await this.child.clearAssetSubjectInfo(frameIdOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -614,6 +656,7 @@ export class PublisherInterface {
     variableName: string,
     isLocked: boolean
   ): Promise<void> {
+    this.createDebugLog("setVariableIsLocked()");
     const response = await this.child.setVariableIsLocked(
       variableName,
       isLocked
