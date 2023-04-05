@@ -246,11 +246,11 @@ export class PublisherInterface {
    * @returns Returns boolean to signify if the document has been changed since previous save.
    */
   public async getDirtyState(): Promise<boolean> {
+    this.createDebugLog("getDirtyState()");
     const response = await this.child.getDirtyState();
     if (response.isError) {
       throw new Error(response.error)
     }
-    this.createDebugLog("getDirtyState()");
     return response.ok;
   }
 
@@ -273,7 +273,6 @@ export class PublisherInterface {
   public async previousPage(): Promise<void> {
     this.createDebugLog("previousPage()");
     const response = await this.child.previousPage();
-
     if (response.isError) {
       throw new Error(response.error)
     }
@@ -570,7 +569,7 @@ export class PublisherInterface {
    * @param idOrTag - The string id or tag of the frame to clear the subject area.
    */
   public async clearFrameSubjectArea(idOrTag: string): Promise<void> {
-    this.clearFrameSubjectArea("alert()");
+    this.createDebugLog("clearFrameSubjectArea()");
     const response = await this.child.clearFrameSubjectArea(idOrTag);
     if (response.isError) {
       throw new Error(response.error)
