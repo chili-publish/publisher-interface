@@ -4,6 +4,11 @@ import {AsyncMethodReturns, connectToChild} from "penpal";
 import {Result} from "./types";
 
 interface ChiliWrapper {
+
+  registerFunction(name:string, body:string): Result<undefined>;
+
+  runRegisteredFunction(name: string): Result<string | number | boolean | object | null | undefined>;
+
   alert(
     message: string,
     title: string
@@ -224,6 +229,34 @@ export class PublisherInterface {
     }
 
     return this.#editorObject;
+  }
+
+  /**
+   * Register a custom function on the iframe side. The function takes one parameter: the editorObject. This function has access to the window, so you can register events to OnEditorEvent. You can access other custom functions in your custom function using window.registeredFunctions, which is a Map. 
+   * 
+   * @param name - The name of the function to register.
+   * @param body - The body of the function.
+   */
+  public async registerFunction(name:string, body:string): Promise<undefined> {
+    this.createDebugLog("registerFunction()");
+    const response = await this.child.registerFunction(name, body);
+    if (response.isError) {
+      throw new Error(response.error)
+    }
+  }
+
+  /**
+   * Runs function that was registered originally by reisterFunction on the iframe side.
+   * 
+   * @param name - The name of the functin to run.
+   */
+  public async runRegisteredFunction(name: string): Promise<string | number | boolean | object | null | undefined> {
+    this.createDebugLog("runReisteredFunction()");
+    const response = await this.child.runRegisteredFunction(name);
+    if (response.isError) {
+      throw new Error(response.error);
+    }
+    return response.ok;
   }
 
   /**
