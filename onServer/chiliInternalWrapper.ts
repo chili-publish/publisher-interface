@@ -5,6 +5,7 @@ declare const window: Window &
   typeof globalThis & {
     editorObject: any;
     OnEditorEvent: any;
+    registeredFunctions: Map<string, (editor:any) => void>
   };
 
 interface InternalWrapper {
@@ -24,6 +25,8 @@ const setUpConnection = () => {
   connection = connectToParent<InternalWrapper>({
     // Methods child is exposing to parent.
     methods: {
+      registerFunction,
+      runRegisteredFunction,
       alert,
       getDirtyState,
       nextPage,
@@ -55,6 +58,17 @@ const setUpConnection = () => {
     });
   };
 };
+
+window.registeredFunctions = new Map();
+
+const registerFunction = (name:string, body:string) => {
+  window.registeredFunctions.set(name, new Function(body, window.editorObject) as any);
+}
+
+const runRegisteredFunction = (name:string) => {
+  const func = window.registeredFunctions.get(name);
+  if (func != null) func(window.editorObject);
+}
 
 const alert = (
   message: string,
