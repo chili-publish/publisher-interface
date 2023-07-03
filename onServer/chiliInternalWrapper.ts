@@ -5,8 +5,13 @@ declare const window: Window &
   typeof globalThis & {
     editorObject: any;
     OnEditorEvent: any;
-    registeredFunctions: Map<string, (editor:any) => void>
+    publisher: any;
+    registeredFunctions: Map<string, (publisher:any) => void>;
+    registeredEventFunctions: Map<string, (publisher:any) => void>
   };
+
+window.registeredFunctions = new Map();
+window.registeredEventFunctions = new Map();
 
 interface InternalWrapper {
   handleEvents(eventName: string, id: string): void;
@@ -26,6 +31,7 @@ const setUpConnection = () => {
     // Methods child is exposing to parent.
     methods: {
       registerFunction,
+      registerFunctionOnEvent,
       runRegisteredFunction,
       alert,
       getDirtyState,
@@ -52,22 +58,77 @@ const setUpConnection = () => {
     },
   });
 
+  window.publisher = {
+    alert: window.editorObject.Alert,
+    getDirtyState: window.editorObject.GetDirtyState,
+    nextPage: window.editorObject.NextPage,
+    previousPage: window.editorObject.PreviousPage,
+    setSelectedPage: window.editorObject.SetSelectedPage,
+    getSelectedPage: window.editorObject.GetSelectedPage,
+    getSelectedPageName: window.editorObject.GetSelectedPageName,
+    getNumPages: window.editorObject.GetNumPages,
+    removeListener: window.editorObject.RemoveListener,
+    addListener: window.editorObject.AddListener,
+    getObject: window.editorObject.GetObject,
+    setProperty: window.editorObject.SetProperty,
+    executeFunction: window.editorObject.ExecuteFunction,
+    getPageSnapshot: window.editorObject.GetPageSnapshot,
+    getFrameSnapshot: window.editorObject.GetFrameSnapshot,
+    getFrameSubjectArea: window.editorObject.GetFrameSubjectArea,
+    setFrameSubjectArea: window.editorObject.SetFrameSubjectArea,
+    clearFrameSubjectArea: window.editorObject.ClearFrameSubjectArea,
+    getAssetSubjectInfo: window.editorObject.GetAssetSubjectInfo,
+    setAssetSubjectInfo: window.editorObject.SetAssetSubjectInfo,
+    clearAssetSubjectInfo: window.editorObject.ClearAssetSubjectInfo,
+    setVariableIsLocked: window.editorObject.SetVariableIsLocked,
+    editorObject: window.editorObject
+  }
+
   window.OnEditorEvent = (eventName: string, id: string) => {
+
+    const eventFunc = window.registeredEventFunctions.get(eventName);
+
+    if (eventFunc != null) eventFunc(window.publisher);
+
     connection.promise.then((parent) => {
       parent.handleEvents(eventName, id);
     });
   };
 };
 
-window.registeredFunctions = new Map();
-
 const registerFunction = (name:string, body:string) => {
-  window.registeredFunctions.set(name, new Function(body, window.editorObject) as any);
+  try {
+    window.registeredFunctions.set(name, new Function("publisher", body) as any);
+    return Ok(undefined);
+  }
+  catch(e) {
+    return Err((e as Error).toString());
+  }
+}
+
+const registerFunctionOnEvent = (eventName:string, body:string) => {
+  try {
+    window.editorObject.AddListener(eventName);
+    window.registeredEventFunctions.set(eventName, new Function("publisher", body) as any);
+    return Ok(undefined);
+  }
+  catch(e) {
+    return Err((e as Error).toString());
+  }
 }
 
 const runRegisteredFunction = (name:string) => {
-  const func = window.registeredFunctions.get(name);
-  if (func != null) func(window.editorObject);
+  try {
+    const func = window.registeredFunctions.get(name);
+    if (func != null) {
+      func(window.publisher);
+      return Ok(undefined);
+    }
+    return Err(`Function ${name} not found`);
+  }
+  catch(e) {
+    return Err((e as Error).toString());
+  }
 }
 
 const alert = (

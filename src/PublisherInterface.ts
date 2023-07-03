@@ -7,6 +7,8 @@ interface ChiliWrapper {
 
   registerFunction(name:string, body:string): Result<undefined>;
 
+  registerFunctionOnEvent(eventName:string, body:string): Result<undefined>;
+
   runRegisteredFunction(name: string): Result<string | number | boolean | object | null | undefined>;
 
   alert(
@@ -244,6 +246,21 @@ export class PublisherInterface {
       throw new Error(response.error)
     }
   }
+
+  /**
+   * Register a custom function on the iframe side. The function takes one parameter: the editorObject. This function has access to the window, so you can register events to OnEditorEvent. You can access other custom functions in your custom function using window.registeredFunctions, which is a Map. 
+   * 
+   * @param name - The name of the function to register.
+   * @param body - The body of the function.
+   */
+  public async registerFunctionOnEvent(eventName:string, body:string): Promise<void> {
+    this.createDebugLog("registerFunction()");
+    const response = await this.child.registerFunctionOnEvent(eventName, body);
+    if (response.isError) {
+      throw new Error(response.error)
+    }
+  }
+
 
   /**
    * Runs function that was registered originally by reisterFunction on the iframe side.
