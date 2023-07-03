@@ -234,7 +234,7 @@ export class PublisherInterface {
   }
 
   /**
-   * Register a custom function on the iframe side. The function takes one parameter: the editorObject. This function has access to the window, so you can register events to OnEditorEvent. You can access other custom functions in your custom function using window.registeredFunctions, which is a Map. 
+   * Register a custom function on the iframe side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
    * 
    * @param name - The name of the function to register.
    * @param body - The body of the function.
@@ -248,9 +248,9 @@ export class PublisherInterface {
   }
 
   /**
-   * Register a custom function on the iframe side. The function takes one parameter: the editorObject. This function has access to the window, so you can register events to OnEditorEvent. You can access other custom functions in your custom function using window.registeredFunctions, which is a Map. 
+   * Register a custom function on the iframe side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
    * 
-   * @param name - The name of the function to register.
+   * @param eventName - The name of the event to trigger the function.
    * @param body - The body of the function.
    */
   public async registerFunctionOnEvent(eventName:string, body:string): Promise<void> {
