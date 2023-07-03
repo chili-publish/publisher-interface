@@ -23,79 +23,6 @@ const editorCheck = setInterval(() => {
   }
 }, 500);
 
-let connection: Connection<InternalWrapper>;
-const setUpConnection = () => {
-  clearInterval(editorCheck);
-
-  connection = connectToParent<InternalWrapper>({
-    // Methods child is exposing to parent.
-    methods: {
-      registerFunction,
-      registerFunctionOnEvent,
-      runRegisteredFunction,
-      alert,
-      getDirtyState,
-      nextPage,
-      previousPage,
-      setSelectedPage,
-      getSelectedPage,
-      getSelectedPageName,
-      getNumPages,
-      removeListener,
-      addListener,
-      setProperty,
-      getObject,
-      executeFunction,
-      getPageSnapshot,
-      getFrameSnapshot,
-      getFrameSubjectArea,
-      setFrameSubjectArea,
-      clearFrameSubjectArea,
-      getAssetSubjectInfo,
-      setAssetSubjectInfo,
-      clearAssetSubjectInfo,
-      setVariableIsLocked,
-    },
-  });
-
-  window.publisher = {
-    alert: window.editorObject.Alert,
-    getDirtyState: window.editorObject.GetDirtyState,
-    nextPage: window.editorObject.NextPage,
-    previousPage: window.editorObject.PreviousPage,
-    setSelectedPage: window.editorObject.SetSelectedPage,
-    getSelectedPage: window.editorObject.GetSelectedPage,
-    getSelectedPageName: window.editorObject.GetSelectedPageName,
-    getNumPages: window.editorObject.GetNumPages,
-    removeListener: window.editorObject.RemoveListener,
-    addListener: window.editorObject.AddListener,
-    getObject: window.editorObject.GetObject,
-    setProperty: window.editorObject.SetProperty,
-    executeFunction: window.editorObject.ExecuteFunction,
-    getPageSnapshot: window.editorObject.GetPageSnapshot,
-    getFrameSnapshot: window.editorObject.GetFrameSnapshot,
-    getFrameSubjectArea: window.editorObject.GetFrameSubjectArea,
-    setFrameSubjectArea: window.editorObject.SetFrameSubjectArea,
-    clearFrameSubjectArea: window.editorObject.ClearFrameSubjectArea,
-    getAssetSubjectInfo: window.editorObject.GetAssetSubjectInfo,
-    setAssetSubjectInfo: window.editorObject.SetAssetSubjectInfo,
-    clearAssetSubjectInfo: window.editorObject.ClearAssetSubjectInfo,
-    setVariableIsLocked: window.editorObject.SetVariableIsLocked,
-    editorObject: window.editorObject
-  }
-
-  window.OnEditorEvent = (eventName: string, id: string) => {
-
-    const eventFunc = window.registeredEventFunctions.get(eventName);
-
-    if (eventFunc != null) eventFunc(window.publisher, id);
-
-    connection.promise.then((parent) => {
-      parent.handleEvents(eventName, id);
-    });
-  };
-};
-
 const registerFunction = (name:string, body:string) => {
   try {
     window.registeredFunctions.set(name, new Function("publisher", "id", body) as any);
@@ -402,4 +329,103 @@ const setVariableIsLocked = (
   } catch (e) {
     return Err((e as Error).toString());
   }
+};
+
+const setUpConnection = () => {
+  clearInterval(editorCheck);
+
+  const connection: Connection<InternalWrapper> = connectToParent<InternalWrapper>({
+    // Methods child is exposing to parent.
+    methods: {
+      registerFunction,
+      registerFunctionOnEvent,
+      runRegisteredFunction,
+      alert,
+      getDirtyState,
+      nextPage,
+      previousPage,
+      setSelectedPage,
+      getSelectedPage,
+      getSelectedPageName,
+      getNumPages,
+      removeListener,
+      addListener,
+      setProperty,
+      getObject,
+      executeFunction,
+      getPageSnapshot,
+      getFrameSnapshot,
+      getFrameSubjectArea,
+      setFrameSubjectArea,
+      clearFrameSubjectArea,
+      getAssetSubjectInfo,
+      setAssetSubjectInfo,
+      clearAssetSubjectInfo,
+      setVariableIsLocked,
+    },
+  });
+
+  window.publisher = {
+    registerFunction: (name:string, body:string) => {
+      const res = registerFunction(name, body);
+      if (res.isError) {
+        throw new Error(res.error);
+      }
+      else {
+        return res.ok;
+      }
+    },
+    registerFunctionOnEvent: (eventName:string, body:string) => {
+      const res = registerFunctionOnEvent(eventName, body);
+      if (res.isError) {
+        throw new Error(res.error);
+      }
+      else {
+        return res.ok;
+      }
+    },
+    runRegisteredFunction: (name:string) => {
+      const res = runRegisteredFunction(name);
+      if (res.isError) {
+        throw new Error(res.error);
+      }
+      else {
+        return res.ok;
+      }
+    },
+    alert: window.editorObject.Alert,
+    getDirtyState: window.editorObject.GetDirtyState,
+    nextPage: window.editorObject.NextPage,
+    previousPage: window.editorObject.PreviousPage,
+    setSelectedPage: window.editorObject.SetSelectedPage,
+    getSelectedPage: window.editorObject.GetSelectedPage,
+    getSelectedPageName: window.editorObject.GetSelectedPageName,
+    getNumPages: window.editorObject.GetNumPages,
+    removeListener: window.editorObject.RemoveListener,
+    addListener: window.editorObject.AddListener,
+    getObject: window.editorObject.GetObject,
+    setProperty: window.editorObject.SetProperty,
+    executeFunction: window.editorObject.ExecuteFunction,
+    getPageSnapshot: window.editorObject.GetPageSnapshot,
+    getFrameSnapshot: window.editorObject.GetFrameSnapshot,
+    getFrameSubjectArea: window.editorObject.GetFrameSubjectArea,
+    setFrameSubjectArea: window.editorObject.SetFrameSubjectArea,
+    clearFrameSubjectArea: window.editorObject.ClearFrameSubjectArea,
+    getAssetSubjectInfo: window.editorObject.GetAssetSubjectInfo,
+    setAssetSubjectInfo: window.editorObject.SetAssetSubjectInfo,
+    clearAssetSubjectInfo: window.editorObject.ClearAssetSubjectInfo,
+    setVariableIsLocked: window.editorObject.SetVariableIsLocked,
+    editorObject: window.editorObject
+  }
+
+  window.OnEditorEvent = (eventName: string, id: string) => {
+
+    const eventFunc = window.registeredEventFunctions.get(eventName);
+
+    if (eventFunc != null) eventFunc(window.publisher, id);
+
+    connection.promise.then((parent) => {
+      parent.handleEvents(eventName, id);
+    });
+  };
 };
