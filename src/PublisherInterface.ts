@@ -237,7 +237,7 @@ export class PublisherInterface {
    * @param name - The name of the function to register.
    * @param body - The body of the function.
    */
-  public async registerFunction(name:string, body:string): Promise<undefined> {
+  public async registerFunction(name:string, body:string): Promise<void> {
     this.createDebugLog("registerFunction()");
     const response = await this.child.registerFunction(name, body);
     if (response.isError) {
