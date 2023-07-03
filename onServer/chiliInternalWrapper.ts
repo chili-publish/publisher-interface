@@ -7,7 +7,7 @@ declare const window: Window &
     OnEditorEvent: any;
     publisher: any;
     registeredFunctions: Map<string, (publisher:any) => void>;
-    registeredEventFunctions: Map<string, (publisher:any) => void>
+    registeredEventFunctions: Map<string, (publisher:any, id:string) => void>
   };
 
 window.registeredFunctions = new Map();
@@ -88,7 +88,7 @@ const setUpConnection = () => {
 
     const eventFunc = window.registeredEventFunctions.get(eventName);
 
-    if (eventFunc != null) eventFunc(window.publisher);
+    if (eventFunc != null) eventFunc(window.publisher, id);
 
     connection.promise.then((parent) => {
       parent.handleEvents(eventName, id);
@@ -98,7 +98,7 @@ const setUpConnection = () => {
 
 const registerFunction = (name:string, body:string) => {
   try {
-    window.registeredFunctions.set(name, new Function("publisher", body) as any);
+    window.registeredFunctions.set(name, new Function("publisher", "id", body) as any);
     return Ok(undefined);
   }
   catch(e) {
