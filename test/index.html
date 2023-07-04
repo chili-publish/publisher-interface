@@ -3,7 +3,18 @@
   <body>
     <div id="test">
       <div id="url" src=""></div>
-      <iframe></iframe>
+      <iframe>
+        <body>
+          <script>
+            window.editorObject = {
+              getObject: () => {}
+            }
+          </script>
+          <script type="module">
+            import "./chiliInternalWrapper.min.js";
+          </script>
+        </body>
+      </iframe>
       <ul id="results"></ul>
     </div>
     <script type="module">

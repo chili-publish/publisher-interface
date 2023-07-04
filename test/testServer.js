@@ -43,7 +43,7 @@ const requestListener = function (req, res) {
       console.log("Error reading file: " + error.code);
     } else {
       res.writeHead(200, { "Content-Type": contentType });
-      res.end(content.replace(`src=""`, `src="${iframeUrl}"`), "utf-8");
+      res.end(content, "utf-8");
     }
   });
 };

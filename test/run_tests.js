@@ -52,6 +52,7 @@ async function main() {
   const copySuccess = await new Promise((res) => {
     exec(
       "cp ./dist/PublisherInterface.min.js ./test/PublisherInterface.min.js",
+      "cp ./dist/chiliInternalWrapper.min.js ./test/chiliInternalWrapper.min.js",
       (error, stdout, stderr) => {
         if (error) {
           res([false, error]);
