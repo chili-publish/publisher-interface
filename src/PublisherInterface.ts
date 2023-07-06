@@ -4,6 +4,13 @@ import {AsyncMethodReturns, connectToChild} from "penpal";
 import {Result} from "./types";
 
 interface ChiliWrapper {
+
+  registerFunction(name:string, body:string): Result<undefined>;
+
+  registerFunctionOnEvent(eventName:string, body:string): Result<undefined>;
+
+  runRegisteredFunction(name: string): Result<string | number | boolean | object | null | undefined>;
+
   alert(
     message: string,
     title: string
@@ -224,6 +231,49 @@ export class PublisherInterface {
     }
 
     return this.#editorObject;
+  }
+
+  /**
+   * Register a custom function on the iframe side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
+   * 
+   * @param name - The name of the function to register.
+   * @param body - The body of the function.
+   */
+  public async registerFunction(name:string, body:string): Promise<void> {
+    this.createDebugLog("registerFunction()");
+    const response = await this.child.registerFunction(name, body);
+    if (response.isError) {
+      throw new Error(response.error)
+    }
+  }
+
+  /**
+   * Register a custom function on the iframe side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
+   * 
+   * @param eventName - The name of the event to trigger the function.
+   * @param body - The body of the function.
+   */
+  public async registerFunctionOnEvent(eventName:string, body:string): Promise<void> {
+    this.createDebugLog("registerFunction()");
+    const response = await this.child.registerFunctionOnEvent(eventName, body);
+    if (response.isError) {
+      throw new Error(response.error)
+    }
+  }
+
+
+  /**
+   * Runs function that was registered originally by reisterFunction on the iframe side.
+   * 
+   * @param name - The name of the functin to run.
+   */
+  public async runRegisteredFunction(name: string): Promise<string | number | boolean | object | null | undefined> {
+    this.createDebugLog("runReisteredFunction()");
+    const response = await this.child.runRegisteredFunction(name);
+    if (response.isError) {
+      throw new Error(response.error);
+    }
+    return response.ok;
   }
 
   /**
