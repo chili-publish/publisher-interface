@@ -366,31 +366,33 @@ const setUpConnection = () => {
   });
 
   window.publisher = {
-    registerFunction: (name:string, body:string) => {
-      const res = registerFunction(name, body);
-      if (res.isError) {
-        throw new Error(res.error);
-      }
-      else {
-        return res.ok;
-      }
-    },
-    registerFunctionOnEvent: (eventName:string, body:string) => {
-      const res = registerFunctionOnEvent(eventName, body);
-      if (res.isError) {
-        throw new Error(res.error);
-      }
-      else {
-        return res.ok;
-      }
-    },
-    runRegisteredFunction: (name:string) => {
-      const res = runRegisteredFunction(name);
-      if (res.isError) {
-        throw new Error(res.error);
-      }
-      else {
-        return res.ok;
+    iframe: {
+      registerFunction: (name:string, body:string) => {
+        const res = registerFunction(name, body);
+        if (res.isError) {
+          throw new Error(res.error);
+        }
+        else {
+          return res.ok;
+        }
+      },
+      registerFunctionOnEvent: (eventName:string, body:string) => {
+        const res = registerFunctionOnEvent(eventName, body);
+        if (res.isError) {
+          throw new Error(res.error);
+        }
+        else {
+          return res.ok;
+        }
+      },
+      runRegisteredFunction: (name:string) => {
+        const res = runRegisteredFunction(name);
+        if (res.isError) {
+          throw new Error(res.error);
+        }
+        else {
+          return res.ok;
+        }
       }
     },
     alert: window.editorObject.Alert,
@@ -424,7 +426,7 @@ const setUpConnection = () => {
 
     if (eventFunc != null) eventFunc(window.publisher, id);
 
-    connection.promise.then((parent) => {
+    connection.promise.then((parent:any) => {
       parent.handleEvents(eventName, id);
     });
   };
