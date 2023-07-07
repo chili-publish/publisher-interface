@@ -228,7 +228,7 @@ export class PublisherInterface {
       debug: options.penpalDebug
     }).promise;
     
-    publisherInterface.iframe = createPublisherIframeFunctions(publisherInterface.child, publisherInterface.createDebugLog);
+    publisherInterface.iframe = createPublisherIframeFunctions(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
     publisherInterface.debug = options.penpalDebug ?? false;
     
     publisherInterface.creationTime = new Date().toLocaleString();
