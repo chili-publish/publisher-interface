@@ -9,7 +9,7 @@ interface ChiliWrapper {
 
   registerFunctionOnEvent(eventName:string, body:string): Result<undefined>;
 
-  runRegisteredFunction(name: string): Result<string | number | boolean | object | null | undefined>;
+  runRegisteredFunction(name: string): Result<undefined>;
 
   alert(
     message: string,
@@ -130,7 +130,74 @@ export type buildOptions = {
   events?:(string|{name:string, func?:(targetId: string) => void})[]
 }
 
+export type publisherIframeFunctions = {
+    /**
+   * Register a custom function on the iframe side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
+   * 
+   * @param name - The name of the function to register.
+   * @param body - The body of the function.
+   */
+  registerFunction: (name:string, body:string) => Promise<void>,
+
+  /**
+   * Register a custom function on the iframe side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
+   * 
+   * @param eventName - The name of the event to trigger the function.
+   * @param body - The body of the function.
+   */
+  registerFunctionOnEvent: (eventName:string, body:string) => Promise<void>,
+
+  /**
+   * Runs function that was registered originally by reisterFunction on the iframe side. Due to...
+   * 
+   * @param name - The name of the functin to run.
+   */
+    runRegisteredFunction: (name: string) => Promise<void>
+}
+
+
+const createPublisherIframeFunctions = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(log:string)=>void):publisherIframeFunctions {
+  return {
+
+    registerFunction: async function(name:string, body:string): Promise<void> {
+      createDebugLog("registerFunction()");
+      const response = await chiliWrapper.registerFunction(name, body);
+      if (response.isError) {
+        throw new Error(response.error)
+      }
+    },
+  
+    registerFunctionOnEvent: async function(eventName:string, body:string): Promise<void> {
+      createDebugLog("registerFunction()");
+      const response = await chiliWrapper.registerFunctionOnEvent(eventName, body);
+      if (response.isError) {
+        throw new Error(response.error)
+      }
+    },
+  
+    runRegisteredFunction: async function(name: string): Promise<void> {
+      createDebugLog("runReisteredFunction()");
+      const response = await chiliWrapper.runRegisteredFunction(name);
+      if (response.isError) {
+        throw new Error(response.error);
+      }
+      return response.ok;
+    }
+  }
+}
+
 export class PublisherInterface {
+  public iframe: publisherIframeFunctions = {
+    registerFunction: function (name: string, body: string): Promise<void> {
+      throw new Error("Function not implemented.");
+    },
+    registerFunctionOnEvent: function (eventName: string, body: string): Promise<void> {
+      throw new Error("Function not implemented.");
+    },
+    runRegisteredFunction: function (name: string): Promise<void> {
+      throw new Error("Function not implemented.");
+    }
+  };
   private child!: AsyncMethodReturns<ChiliWrapper>;
   private chiliEventListenerCallbacks: Map<string, (targetId: string) => void> =
       new Map<string, (targetId: string) => void>();
@@ -160,9 +227,10 @@ export class PublisherInterface {
       timeout: options.timeout,
       debug: options.penpalDebug
     }).promise;
-
+    
+    publisherInterface.iframe = createPublisherIframeFunctions(publisherInterface.child, publisherInterface.createDebugLog);
     publisherInterface.debug = options.penpalDebug ?? false;
-
+    
     publisherInterface.creationTime = new Date().toLocaleString();
     publisherInterface.createDebugLog("build()");
 
@@ -232,50 +300,7 @@ export class PublisherInterface {
 
     return this.#editorObject;
   }
-
-  /**
-   * Register a custom function on the iframe side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
-   * 
-   * @param name - The name of the function to register.
-   * @param body - The body of the function.
-   */
-  public async registerFunction(name:string, body:string): Promise<void> {
-    this.createDebugLog("registerFunction()");
-    const response = await this.child.registerFunction(name, body);
-    if (response.isError) {
-      throw new Error(response.error)
-    }
-  }
-
-  /**
-   * Register a custom function on the iframe side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
-   * 
-   * @param eventName - The name of the event to trigger the function.
-   * @param body - The body of the function.
-   */
-  public async registerFunctionOnEvent(eventName:string, body:string): Promise<void> {
-    this.createDebugLog("registerFunction()");
-    const response = await this.child.registerFunctionOnEvent(eventName, body);
-    if (response.isError) {
-      throw new Error(response.error)
-    }
-  }
-
-
-  /**
-   * Runs function that was registered originally by reisterFunction on the iframe side.
-   * 
-   * @param name - The name of the functin to run.
-   */
-  public async runRegisteredFunction(name: string): Promise<string | number | boolean | object | null | undefined> {
-    this.createDebugLog("runReisteredFunction()");
-    const response = await this.child.runRegisteredFunction(name);
-    if (response.isError) {
-      throw new Error(response.error);
-    }
-    return response.ok;
-  }
-
+  
   /**
    * Displays a modal box within the editor UI containing a title with a message.
    *
