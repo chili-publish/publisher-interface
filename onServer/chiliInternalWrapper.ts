@@ -366,7 +366,7 @@ const setUpConnection = () => {
   });
 
   window.publisher = {
-    iframe: {
+    window: {
       registerFunction: (name:string, body:string) => {
         const res = registerFunction(name, body);
         if (res.isError) {

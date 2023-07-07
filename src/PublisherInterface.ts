@@ -130,9 +130,9 @@ export type buildOptions = {
   events?:(string|{name:string, func?:(targetId: string) => void})[]
 }
 
-export type publisherIframeFunctions = {
+export type publisherWindowFunctions = {
     /**
-   * Register a custom function on the iframe side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
+   * Register a custom function on the iframe window side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
    * 
    * @param name - The name of the function to register.
    * @param body - The body of the function.
@@ -140,7 +140,7 @@ export type publisherIframeFunctions = {
   registerFunction: (name:string, body:string) => Promise<void>,
 
   /**
-   * Register a custom function on the iframe side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
+   * Register a custom function on the iframe window side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
    * 
    * @param eventName - The name of the event to trigger the function.
    * @param body - The body of the function.
@@ -148,15 +148,15 @@ export type publisherIframeFunctions = {
   registerFunctionOnEvent: (eventName:string, body:string) => Promise<void>,
 
   /**
-   * Runs function that was registered originally by reisterFunction on the iframe side. Due to...
+   * Runs function that was registered originally by registerFunction on the iframe window side. Due to async, you function's return will be ignored.
    * 
-   * @param name - The name of the functin to run.
+   * @param name - The name of the function to run.
    */
     runRegisteredFunction: (name: string) => Promise<void>
 }
 
 
-const createPublisherIframeFunctions = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(log:string)=>void):publisherIframeFunctions {
+const createPublisherWindowFunctions = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(log:string)=>void):publisherWindowFunctions {
   return {
 
     registerFunction: async function(name:string, body:string): Promise<void> {
@@ -176,7 +176,7 @@ const createPublisherIframeFunctions = function(chiliWrapper:AsyncMethodReturns<
     },
   
     runRegisteredFunction: async function(name: string): Promise<void> {
-      createDebugLog("runReisteredFunction()");
+      createDebugLog("runRegisteredFunction()");
       const response = await chiliWrapper.runRegisteredFunction(name);
       if (response.isError) {
         throw new Error(response.error);
@@ -187,7 +187,7 @@ const createPublisherIframeFunctions = function(chiliWrapper:AsyncMethodReturns<
 }
 
 export class PublisherInterface {
-  public iframe: publisherIframeFunctions = {
+  public window: publisherWindowFunctions = {
     registerFunction: function (name: string, body: string): Promise<void> {
       throw new Error("Function not implemented.");
     },
@@ -228,7 +228,7 @@ export class PublisherInterface {
       debug: options.penpalDebug
     }).promise;
     
-    publisherInterface.iframe = createPublisherIframeFunctions(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
+    publisherInterface.window = createPublisherWindowFunctions(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
     publisherInterface.debug = options.penpalDebug ?? false;
     
     publisherInterface.creationTime = new Date().toLocaleString();
