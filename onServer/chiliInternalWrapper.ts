@@ -417,7 +417,30 @@ const setUpConnection = () => {
     setAssetSubjectInfo: promisify(window.editorObject.SetAssetSubjectInfo),
     clearAssetSubjectInfo: promisify(window.editorObject.ClearAssetSubjectInfo),
     setVariableIsLocked: promisify(window.editorObject.SetVariableIsLocked),
-    editorObject: window.editorObject
+    editorObject: {
+      Alert: promisify(window.editorObject.Alert),
+      GetDirtyState: promisify(window.editorObject.GetDirtyState),
+      NextPage: promisify(window.editorObject.NextPage),
+      PreviousPage: promisify(window.editorObject.PreviousPage),
+      SetSelectedPage: promisify(window.editorObject.SetSelectedPage),
+      GetSelectedPage: promisify(window.editorObject.GetSelectedPage),
+      GetSelectedPageName: promisify(window.editorObject.GetSelectedPageName),
+      GetNumPages: promisify(window.editorObject.GetNumPages),
+      RemoveListener: promisify(window.editorObject.RemoveListener),
+      AddListener: promisify(window.editorObject.AddListener),
+      GetObject: promisify(window.editorObject.GetObject),
+      SetProperty: promisify(window.editorObject.SetProperty),
+      ExecuteFunction: promisify(window.editorObject.ExecuteFunction),
+      GetPageSnapshot: promisify(window.editorObject.GetPageSnapshot),
+      GetFrameSnapshot: promisify(window.editorObject.GetFrameSnapshot),
+      GetFrameSubjectArea: promisify(window.editorObject.GetFrameSubjectArea),
+      SetFrameSubjectArea: promisify(window.editorObject.SetFrameSubjectArea),
+      ClearFrameSubjectArea: promisify(window.editorObject.ClearFrameSubjectArea),
+      GetAssetSubjectInfo: promisify(window.editorObject.GetAssetSubjectInfo),
+      SetAssetSubjectInfo: promisify(window.editorObject.SetAssetSubjectInfo),
+      ClearAssetSubjectInfo: promisify(window.editorObject.ClearAssetSubjectInfo),
+      SetVariableIsLocked: promisify(window.editorObject.SetVariableIsLocked),
+    }
   }
 
   window.OnEditorEvent = (eventName: string, id: string) => {
