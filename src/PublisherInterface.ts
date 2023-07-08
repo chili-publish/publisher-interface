@@ -155,7 +155,7 @@ export type CustomFunctionsInterface = {
    * 
    * @param name - The name of the function to run.
    */
-    execute: (name: string) => Promise<void>
+    execute: (name: string, args:any[]) => Promise<any>
 }
 
 
@@ -178,7 +178,7 @@ const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<
       }
     },
   
-    execute: async function(name: string, args:any[] = []): Promise<void> {
+    execute: async function(name: string, args:any[] = []): Promise<any> {
       createDebugLog("executeRegisteredFunction()");
       const response = await chiliWrapper.executeRegisteredFunction(name, args);
       if (response.isError) {
@@ -197,7 +197,7 @@ export class PublisherInterface {
     registerOnEvent: function (eventName: string, body: string): Promise<void> {
       throw new Error("Function not implemented.");
     },
-    execute: function (name: string): Promise<void> {
+    execute: function (name: strin, args:any[]): Promise<any> {
       throw new Error("Function not implemented.");
     }
   };

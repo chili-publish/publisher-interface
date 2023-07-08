@@ -48,13 +48,12 @@ const executeRegisteredFunction = (name:string, args:any[]) => {
   try {
     const func = window.registeredFunctions.get(name);
     if (func != null) {
-      func(window.publisher, args);
-      return Ok(undefined);
+      return Promise.resolve(func(window.publisher, args)).then(res => Ok(res), err => Err((err as Error).toString()))
     }
-    return Err(`Function ${name} not found`);
+    return Promise.resolve(Err(`Function ${name} not found`));
   }
   catch(e) {
-    return Err((e as Error).toString());
+    return Promise.resolve(Err((e as Error).toString()));
   }
 }
 
@@ -386,13 +385,14 @@ const setUpConnection = () => {
         }
       },
       execute: (name:string, args:any[]) => {
-        const res = executeRegisteredFunction(name, args);
-        if (res.isError) {
-          throw new Error(res.error);
-        }
-        else {
-          return res.ok;
-        }
+        return executeRegisteredFunction(name, args).then(res => {
+          if (res.isError) {
+            throw new Error(res.error);
+          }
+          else {
+            return res.ok;
+          }
+        })
       }
     },
     alert: window.editorObject.Alert,
@@ -431,3 +431,6 @@ const setUpConnection = () => {
     });
   };
 };
+
+
+
