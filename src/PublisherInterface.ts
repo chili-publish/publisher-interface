@@ -154,6 +154,7 @@ export type CustomFunctionsInterface = {
    * Executes a function that was registered originally by registerFunction on the iframe window side and allows you to pass any number of args. It will return the result of the called function.
    * 
    * @param name - The name of the function to run.
+   * @param args - An array that will be passed to the function - items in array need survive JSON.stringify
    */
     execute: (name: string, args:any[]) => Promise<any>
 }
