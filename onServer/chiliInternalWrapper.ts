@@ -366,7 +366,7 @@ const setUpConnection = () => {
 
   window.publisher = {
     customFunction: {
-      register: (name:string, body:string) => {
+      register: promisify((name:string, body:string) => {
         const res = registerFunction(name, body);
         if (res.isError) {
           throw new Error(res.error);
@@ -374,8 +374,8 @@ const setUpConnection = () => {
         else {
           return res.ok;
         }
-      },
-      registerOnEvent: (eventName:string, body:string) => {
+      }),
+      registerOnEvent: promisify((eventName:string, body:string) => {
         const res = registerFunctionOnEvent(eventName, body);
         if (res.isError) {
           throw new Error(res.error);
@@ -383,7 +383,7 @@ const setUpConnection = () => {
         else {
           return res.ok;
         }
-      },
+      }),
       execute: (name:string, args:any[]) => {
         return executeRegisteredFunction(name, args).then(res => {
           if (res.isError) {
@@ -395,28 +395,28 @@ const setUpConnection = () => {
         })
       }
     },
-    alert: window.editorObject.Alert,
-    getDirtyState: window.editorObject.GetDirtyState,
-    nextPage: window.editorObject.NextPage,
-    previousPage: window.editorObject.PreviousPage,
-    setSelectedPage: window.editorObject.SetSelectedPage,
-    getSelectedPage: window.editorObject.GetSelectedPage,
-    getSelectedPageName: window.editorObject.GetSelectedPageName,
-    getNumPages: window.editorObject.GetNumPages,
-    removeListener: window.editorObject.RemoveListener,
-    addListener: window.editorObject.AddListener,
-    getObject: window.editorObject.GetObject,
-    setProperty: window.editorObject.SetProperty,
-    executeFunction: window.editorObject.ExecuteFunction,
-    getPageSnapshot: window.editorObject.GetPageSnapshot,
-    getFrameSnapshot: window.editorObject.GetFrameSnapshot,
-    getFrameSubjectArea: window.editorObject.GetFrameSubjectArea,
-    setFrameSubjectArea: window.editorObject.SetFrameSubjectArea,
-    clearFrameSubjectArea: window.editorObject.ClearFrameSubjectArea,
-    getAssetSubjectInfo: window.editorObject.GetAssetSubjectInfo,
-    setAssetSubjectInfo: window.editorObject.SetAssetSubjectInfo,
-    clearAssetSubjectInfo: window.editorObject.ClearAssetSubjectInfo,
-    setVariableIsLocked: window.editorObject.SetVariableIsLocked,
+    alert: promisify(window.editorObject.Alert),
+    getDirtyState: promisify(window.editorObject.GetDirtyState),
+    nextPage: promisify(window.editorObject.NextPage),
+    previousPage: promisify(window.editorObject.PreviousPage),
+    setSelectedPage: promisify(window.editorObject.SetSelectedPage),
+    getSelectedPage: promisify(window.editorObject.GetSelectedPage),
+    getSelectedPageName: promisify(window.editorObject.GetSelectedPageName),
+    getNumPages: promisify(window.editorObject.GetNumPages),
+    removeListener: promisify(window.editorObject.RemoveListener),
+    addListener: promisify(window.editorObject.AddListener),
+    getObject: promisify(window.editorObject.GetObject),
+    setProperty: promisify(window.editorObject.SetProperty),
+    executeFunction: promisify(window.editorObject.ExecuteFunction),
+    getPageSnapshot: promisify(window.editorObject.GetPageSnapshot),
+    getFrameSnapshot: promisify(window.editorObject.GetFrameSnapshot),
+    getFrameSubjectArea: promisify(window.editorObject.GetFrameSubjectArea),
+    setFrameSubjectArea: promisify(window.editorObject.SetFrameSubjectArea),
+    clearFrameSubjectArea: promisify(window.editorObject.ClearFrameSubjectArea),
+    getAssetSubjectInfo: promisify(window.editorObject.GetAssetSubjectInfo),
+    setAssetSubjectInfo: promisify(window.editorObject.SetAssetSubjectInfo),
+    clearAssetSubjectInfo: promisify(window.editorObject.ClearAssetSubjectInfo),
+    setVariableIsLocked: promisify(window.editorObject.SetVariableIsLocked),
     editorObject: window.editorObject
   }
 
@@ -432,5 +432,4 @@ const setUpConnection = () => {
   };
 };
 
-
-
+function promisify(func:any) {return (...args: any) => Promise.resolve(func(...args))}
