@@ -198,7 +198,7 @@ export class PublisherInterface {
     registerOnEvent: function (eventName: string, body: string): Promise<void> {
       throw new Error("Function not implemented.");
     },
-    execute: function (name: strin, args:any[]): Promise<any> {
+    execute: function (name: string, args:any[]): Promise<any> {
       throw new Error("Function not implemented.");
     }
   };
