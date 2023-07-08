@@ -7,11 +7,13 @@ declare const window: Window &
     OnEditorEvent: any;
     publisher: any;
     registeredFunctions: Map<string, (publisher:any, args:any[]) => void>;
-    registeredEventFunctions: Map<string, (publisher:any, id:string) => void>
+    registeredEventFunctions: Map<string, (publisher:any, id:string) => void>;
+    listenerEventShimFunctions: Map<string, (id:string) => void>;
   };
 
 window.registeredFunctions = new Map();
 window.registeredEventFunctions = new Map();
+window.listenerEventShimFunctions = new Map();
 
 interface InternalWrapper {
   handleEvents(eventName: string, id: string): void;
@@ -403,8 +405,8 @@ const setUpConnection = () => {
     getSelectedPage: promisify(window.editorObject.GetSelectedPage),
     getSelectedPageName: promisify(window.editorObject.GetSelectedPageName),
     getNumPages: promisify(window.editorObject.GetNumPages),
-    removeListener: promisify(window.editorObject.RemoveListener),
-    addListener: promisify(window.editorObject.AddListener),
+    removeListener: promisify(removeListenerShim),
+    addListener: promisify(addListenerShim),
     getObject: promisify(window.editorObject.GetObject),
     setProperty: promisify(window.editorObject.SetProperty),
     executeFunction: promisify(window.editorObject.ExecuteFunction),
@@ -426,8 +428,8 @@ const setUpConnection = () => {
       GetSelectedPage: promisify(window.editorObject.GetSelectedPage),
       GetSelectedPageName: promisify(window.editorObject.GetSelectedPageName),
       GetNumPages: promisify(window.editorObject.GetNumPages),
-      RemoveListener: promisify(window.editorObject.RemoveListener),
-      AddListener: promisify(window.editorObject.AddListener),
+      RemoveListener: promisify(removeListenerShim),
+      AddListener: promisify(addListenerShim),
       GetObject: promisify(window.editorObject.GetObject),
       SetProperty: promisify(window.editorObject.SetProperty),
       ExecuteFunction: promisify(window.editorObject.ExecuteFunction),
@@ -445,14 +447,26 @@ const setUpConnection = () => {
 
   window.OnEditorEvent = (eventName: string, id: string) => {
 
-    const eventFunc = window.registeredEventFunctions.get(eventName);
+    const registeredFunc = window.registeredEventFunctions.get(eventName);
+    if (registeredFunc != null) registeredFunc(window.publisher, id);
 
-    if (eventFunc != null) eventFunc(window.publisher, id);
+    const listenerFunc = window.listenerEventShimFunctions.get(eventName);
+    if (listenerFunc != null) listenerFunc(id);
 
     connection.promise.then((parent:any) => {
       parent.handleEvents(eventName, id);
     });
   };
 };
+
+function addListenerShim(eventName:string, callbackFunction?: (targetId: string) => void) {
+  window.editorObject.addListener(eventName);
+  window.listenerEventShimFunctions.set(eventName, callbackFunction ?? ((t) => {return}));
+}
+
+function removeListenerShim(eventName:string) {
+  window.editorObject.removeListener(eventName);
+  window.listenerEventShimFunctions.delete(eventName);
+}
 
 function promisify(func:any) {return (...args: any) => Promise.resolve(func(...args))}
