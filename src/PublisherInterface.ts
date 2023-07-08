@@ -135,7 +135,7 @@ export type buildOptions = {
 
 export type CustomFunctionsInterface = {
     /**
-   * Register a custom function on the iframe window side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
+   * Register a custom function on the iframe window side. The function takes a parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
    * 
    * @param name - The name of the function to register.
    * @param body - The body of the function.
@@ -151,7 +151,7 @@ export type CustomFunctionsInterface = {
   registerOnEvent: (eventName:string, body:string) => Promise<void>,
 
   /**
-   * Runs function that was registered originally by registerFunction on the iframe window side. Due to async, you function's return will be ignored.
+   * Executes a function that was registered originally by registerFunction on the iframe window side and allows you to pass any number of args. It will return the result of the called function.
    * 
    * @param name - The name of the function to run.
    */
