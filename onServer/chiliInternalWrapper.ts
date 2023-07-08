@@ -6,7 +6,7 @@ declare const window: Window &
     editorObject: any;
     OnEditorEvent: any;
     publisher: any;
-    registeredFunctions: Map<string, (publisher:any) => void>;
+    registeredFunctions: Map<string, (publisher:any, args:any[]) => void>;
     registeredEventFunctions: Map<string, (publisher:any, id:string) => void>
   };
 
@@ -25,7 +25,7 @@ const editorCheck = setInterval(() => {
 
 const registerFunction = (name:string, body:string) => {
   try {
-    window.registeredFunctions.set(name, new Function("publisher", "id", body) as any);
+    window.registeredFunctions.set(name, new Function("publisher", "args", body) as any);
     return Ok(undefined);
   }
   catch(e) {
@@ -44,11 +44,11 @@ const registerFunctionOnEvent = (eventName:string, body:string) => {
   }
 }
 
-const runRegisteredFunction = (name:string) => {
+const executeRegisteredFunction = (name:string, args:any[]) => {
   try {
     const func = window.registeredFunctions.get(name);
     if (func != null) {
-      func(window.publisher);
+      func(window.publisher, args);
       return Ok(undefined);
     }
     return Err(`Function ${name} not found`);
@@ -339,7 +339,7 @@ const setUpConnection = () => {
     methods: {
       registerFunction,
       registerFunctionOnEvent,
-      runRegisteredFunction,
+      executeRegisteredFunction,
       alert,
       getDirtyState,
       nextPage,
@@ -366,8 +366,8 @@ const setUpConnection = () => {
   });
 
   window.publisher = {
-    window: {
-      registerFunction: (name:string, body:string) => {
+    customFunction: {
+      register: (name:string, body:string) => {
         const res = registerFunction(name, body);
         if (res.isError) {
           throw new Error(res.error);
@@ -376,7 +376,7 @@ const setUpConnection = () => {
           return res.ok;
         }
       },
-      registerFunctionOnEvent: (eventName:string, body:string) => {
+      registerOnEvent: (eventName:string, body:string) => {
         const res = registerFunctionOnEvent(eventName, body);
         if (res.isError) {
           throw new Error(res.error);
@@ -385,8 +385,8 @@ const setUpConnection = () => {
           return res.ok;
         }
       },
-      runRegisteredFunction: (name:string) => {
-        const res = runRegisteredFunction(name);
+      execute: (name:string, args:any[]) => {
+        const res = executeRegisteredFunction(name, args);
         if (res.isError) {
           throw new Error(res.error);
         }

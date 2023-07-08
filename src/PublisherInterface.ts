@@ -9,7 +9,10 @@ interface ChiliWrapper {
 
   registerFunctionOnEvent(eventName:string, body:string): Result<undefined>;
 
-  runRegisteredFunction(name: string): Result<undefined>;
+  executeRegisteredFunction(
+    name: string, 
+    args: any[]
+  ): Result<undefined>;
 
   alert(
     message: string,
@@ -130,14 +133,14 @@ export type buildOptions = {
   events?:(string|{name:string, func?:(targetId: string) => void})[]
 }
 
-export type publisherWindowFunctions = {
+export type CustomFunctionsInterface = {
     /**
    * Register a custom function on the iframe window side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
    * 
    * @param name - The name of the function to register.
    * @param body - The body of the function.
    */
-  registerFunction: (name:string, body:string) => Promise<void>,
+  register: (name:string, body:string) => Promise<void>,
 
   /**
    * Register a custom function on the iframe window side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
@@ -145,21 +148,21 @@ export type publisherWindowFunctions = {
    * @param eventName - The name of the event to trigger the function.
    * @param body - The body of the function.
    */
-  registerFunctionOnEvent: (eventName:string, body:string) => Promise<void>,
+  registerOnEvent: (eventName:string, body:string) => Promise<void>,
 
   /**
    * Runs function that was registered originally by registerFunction on the iframe window side. Due to async, you function's return will be ignored.
    * 
    * @param name - The name of the function to run.
    */
-    runRegisteredFunction: (name: string) => Promise<void>
+    execute: (name: string) => Promise<void>
 }
 
 
-const createPublisherWindowFunctions = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(log:string)=>void):publisherWindowFunctions {
+const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(log:string)=>void):CustomFunctionsInterface {
   return {
 
-    registerFunction: async function(name:string, body:string): Promise<void> {
+    register: async function(name:string, body:string): Promise<void> {
       createDebugLog("registerFunction()");
       const response = await chiliWrapper.registerFunction(name, body);
       if (response.isError) {
@@ -167,7 +170,7 @@ const createPublisherWindowFunctions = function(chiliWrapper:AsyncMethodReturns<
       }
     },
   
-    registerFunctionOnEvent: async function(eventName:string, body:string): Promise<void> {
+    registerOnEvent: async function(eventName:string, body:string): Promise<void> {
       createDebugLog("registerFunction()");
       const response = await chiliWrapper.registerFunctionOnEvent(eventName, body);
       if (response.isError) {
@@ -175,9 +178,9 @@ const createPublisherWindowFunctions = function(chiliWrapper:AsyncMethodReturns<
       }
     },
   
-    runRegisteredFunction: async function(name: string): Promise<void> {
-      createDebugLog("runRegisteredFunction()");
-      const response = await chiliWrapper.runRegisteredFunction(name);
+    execute: async function(name: string, args:any[] = []): Promise<void> {
+      createDebugLog("executeRegisteredFunction()");
+      const response = await chiliWrapper.executeRegisteredFunction(name, args);
       if (response.isError) {
         throw new Error(response.error);
       }
@@ -187,14 +190,14 @@ const createPublisherWindowFunctions = function(chiliWrapper:AsyncMethodReturns<
 }
 
 export class PublisherInterface {
-  public window: publisherWindowFunctions = {
-    registerFunction: function (name: string, body: string): Promise<void> {
+  public customFunction: CustomFunctionsInterface = {
+    register: function (name: string, body: string): Promise<void> {
       throw new Error("Function not implemented.");
     },
-    registerFunctionOnEvent: function (eventName: string, body: string): Promise<void> {
+    registerOnEvent: function (eventName: string, body: string): Promise<void> {
       throw new Error("Function not implemented.");
     },
-    runRegisteredFunction: function (name: string): Promise<void> {
+    execute: function (name: string): Promise<void> {
       throw new Error("Function not implemented.");
     }
   };
@@ -228,7 +231,7 @@ export class PublisherInterface {
       debug: options.penpalDebug
     }).promise;
     
-    publisherInterface.window = createPublisherWindowFunctions(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
+    publisherInterface.customFunction = createCustomFunctionsInterface(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
     publisherInterface.debug = options.penpalDebug ?? false;
     
     publisherInterface.creationTime = new Date().toLocaleString();
