@@ -143,7 +143,7 @@ export type CustomFunctionsInterface = {
   register: (name:string, body:string) => Promise<void>,
 
   /**
-   * Register a custom function on the iframe window side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
+   * Register a custom function on the iframe window side that runs when an event is called. The function takes two parameters: publisher and targetID. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
    * 
    * @param eventName - The name of the event to trigger the function.
    * @param body - The body of the function.
@@ -440,12 +440,12 @@ export class PublisherInterface {
    */
   public async addListener(
     eventName: string,
-    callbackFunction?: (targetId: string) => void
+    callbackFunction?: (target: string) => void
   ): Promise<void> {
 
     this.createDebugLog("addListener()");
-    this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetId) => {
-      if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetId)
+    this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetID) => {
+      if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetID)
     } : callbackFunction)
 
     const response = await this.child.addListener(eventName);

@@ -38,7 +38,7 @@ const registerFunction = (name:string, body:string) => {
 const registerFunctionOnEvent = (eventName:string, body:string) => {
   try {
     window.editorObject.AddListener(eventName);
-    window.registeredEventFunctions.set(eventName, new Function("publisher", "id", body) as any);
+    window.registeredEventFunctions.set(eventName, new Function("publisher", "targetID", body) as any);
     return Ok(undefined);
   }
   catch(e) {
