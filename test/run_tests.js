@@ -7,24 +7,6 @@ if (!(platform == "darwin" || platform == "linux")) {
 }
 
 async function main() {
-  const urlIdIndex = process.argv.findIndex((value) => value == "--url");
-
-  if (urlIdIndex < 0) {
-    console.log("No --url provided");
-    exit(1);
-  }
-
-  if (urlIdIndex == process.argv.length) {
-    console.log("No --url included");
-    exit(1);
-  }
-
-  const iframeUrl = process.argv[urlIdIndex + 1];
-
-  if (iframeUrl == null) {
-    console.log("--url is null");
-    exit(1);
-  }
 
   const buildSuccess = await new Promise((res) => {
     exec("npm run build", (error, stdout, stderr) => {
@@ -49,9 +31,9 @@ async function main() {
     exit(1);
   }
 
-  const copySuccess = await new Promise((res) => {
+  const copyPISuccess = await new Promise((res) => {
     exec(
-      "cp ./dist/PublisherInterface.min.js ./test/PublisherInterface.min.js",
+      "cp ./dist/PublisherInterface.min.js ./test/dist/PublisherInterface.min.js",
       (error, stdout, stderr) => {
         if (error) {
           res([false, error]);
@@ -67,9 +49,34 @@ async function main() {
     );
   });
 
-  if (!copySuccess[0]) {
+  if (!copyPISuccess[0]) {
     console.log("ERRROR");
-    console.log(copySuccess[1]);
+    console.log(copyPISuccess[1]);
+    exit(1);
+  }
+
+
+  const copyIWSuccess = await new Promise((res) => {
+    exec(
+      "cp ./dist/chiliInternalWrapper.min.js ./test/dist/chiliInternalWrapper.min.js",
+      (error, stdout, stderr) => {
+        if (error) {
+          res([false, error]);
+          return;
+        }
+        if (stderr) {
+          res([false, stderr]);
+          return;
+        }
+
+        res([true, null]);
+      }
+    );
+  });
+ 
+  if (!copyIWSuccess[0]) {
+    console.log("ERRROR");
+    console.log(copyIWSuccess[1]);
     exit(1);
   }
 
@@ -80,7 +87,6 @@ async function main() {
   // On Ubuntu 22.04, this command spawns two processes.
   const serverChild = spawn(
     `node ./test/testServer.js`,
-    ["--url", iframeUrl.replace("&", "^")], // Need to encode & to ^ so we can pass the whole URL as an argument. The & symbol breaks the arugment
     {
       shell: true,
     }
