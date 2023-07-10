@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+  <script>
+    window.editorObject = {};
+    window.OnEditorEvent = {};
+
+    window.addEventListener("message", (event) => {
+      if (event.data.addTest) {
+        createReceiverFor(event.data.name, event.data.response);
+      }
+
+      window.parent.postMessage({testReady: true, name: event.data.name}, "*");
+    })
+
+    function createReceiverFor(funcName, response) {
+      window.editorObject[funcName] = function (...args) {
+        window.parent.postMessage({test: funcName, received:args}, "*")
+        return response;
+      }
+    }
+    
+  </script>
+  <script src="../dist/chiliInternalWrapper.min.js"></script>
+</body>
+</html>
