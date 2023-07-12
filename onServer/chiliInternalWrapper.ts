@@ -180,13 +180,13 @@ const setProperty = (
 const executeFunction = (
   chiliPath: string,
   functionName: string,
-  params: (string | number | boolean | null | undefined)[]
+  args: (string | number | boolean | null | undefined)[]
 ): Result<string | number | boolean | object | null | undefined> => {
   try {
     return Ok(window.editorObject.ExecuteFunction(
       chiliPath,
       functionName,
-      ...params
+      ...args
     ));
   } catch (e) {
     return Err((e as Error).toString());
