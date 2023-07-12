@@ -27,7 +27,7 @@ const editorCheck = setInterval(() => {
 
 const registerFunction = (name:string, body:string) => {
   try {
-    window.registeredFunctions.set(name, new Function("args", body) as any);
+    window.registeredFunctions.set(name, new Function(body) as any);
     return Ok(undefined);
   }
   catch(e) {
