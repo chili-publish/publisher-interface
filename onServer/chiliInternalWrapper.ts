@@ -461,7 +461,9 @@ const setUpConnection = () => {
 
 function addListenerShim(eventName:string, callbackFunction?: (targetId: string) => void) {
   window.editorObject.AddListener(eventName);
-  window.listenerEventShimFunctions.set(eventName, callbackFunction ?? ((t) => {return}));
+  if (callbackFunction != null) {
+    window.listenerEventShimFunctions.set(eventName, callbackFunction);
+  }
 }
 
 function removeListenerShim(eventName:string) {
