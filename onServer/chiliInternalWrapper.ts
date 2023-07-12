@@ -460,12 +460,12 @@ const setUpConnection = () => {
 };
 
 function addListenerShim(eventName:string, callbackFunction?: (targetId: string) => void) {
-  window.editorObject.addListener(eventName);
+  window.editorObject.AddListener(eventName);
   window.listenerEventShimFunctions.set(eventName, callbackFunction ?? ((t) => {return}));
 }
 
 function removeListenerShim(eventName:string) {
-  window.editorObject.removeListener(eventName);
+  window.editorObject.RemoveListener(eventName);
   window.listenerEventShimFunctions.delete(eventName);
 }
 
