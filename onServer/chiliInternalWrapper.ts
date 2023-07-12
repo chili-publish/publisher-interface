@@ -6,12 +6,14 @@ declare const window: Window &
     editorObject: any;
     OnEditorEvent: any;
     publisher: any;
-    registeredFunctions: Map<string, (publisher:any) => void>;
-    registeredEventFunctions: Map<string, (publisher:any, id:string) => void>
+    registeredFunctions: Map<string, (...args:any) => void>;
+    registeredEventFunctions: Map<string, (id:string) => void>;
+    listenerEventShimFunctions: Map<string, (id:string) => void>;
   };
 
 window.registeredFunctions = new Map();
 window.registeredEventFunctions = new Map();
+window.listenerEventShimFunctions = new Map();
 
 interface InternalWrapper {
   handleEvents(eventName: string, id: string): void;
@@ -25,7 +27,7 @@ const editorCheck = setInterval(() => {
 
 const registerFunction = (name:string, body:string) => {
   try {
-    window.registeredFunctions.set(name, new Function("publisher", "id", body) as any);
+    window.registeredFunctions.set(name, new Function(body) as any);
     return Ok(undefined);
   }
   catch(e) {
@@ -36,7 +38,7 @@ const registerFunction = (name:string, body:string) => {
 const registerFunctionOnEvent = (eventName:string, body:string) => {
   try {
     window.editorObject.AddListener(eventName);
-    window.registeredEventFunctions.set(eventName, new Function("publisher", "id", body) as any);
+    window.registeredEventFunctions.set(eventName, new Function("targetID", body) as any);
     return Ok(undefined);
   }
   catch(e) {
@@ -44,17 +46,16 @@ const registerFunctionOnEvent = (eventName:string, body:string) => {
   }
 }
 
-const runRegisteredFunction = (name:string) => {
+const executeRegisteredFunction = (name:string, args:any[]) => {
   try {
     const func = window.registeredFunctions.get(name);
     if (func != null) {
-      func(window.publisher);
-      return Ok(undefined);
+      return Promise.resolve(func(...args)).then(res => Ok(res), err => Err((err as Error).toString()))
     }
-    return Err(`Function ${name} not found`);
+    return Promise.resolve(Err(`Function ${name} not found`));
   }
   catch(e) {
-    return Err((e as Error).toString());
+    return Promise.resolve(Err((e as Error).toString()));
   }
 }
 
@@ -179,13 +180,13 @@ const setProperty = (
 const executeFunction = (
   chiliPath: string,
   functionName: string,
-  params: (string | number | boolean | null | undefined)[]
+  args: (string | number | boolean | null | undefined)[]
 ): Result<string | number | boolean | object | null | undefined> => {
   try {
     return Ok(window.editorObject.ExecuteFunction(
       chiliPath,
       functionName,
-      ...params
+      ...args
     ));
   } catch (e) {
     return Err((e as Error).toString());
@@ -339,7 +340,7 @@ const setUpConnection = () => {
     methods: {
       registerFunction,
       registerFunctionOnEvent,
-      runRegisteredFunction,
+      executeRegisteredFunction,
       alert,
       getDirtyState,
       nextPage,
@@ -366,66 +367,108 @@ const setUpConnection = () => {
   });
 
   window.publisher = {
-    registerFunction: (name:string, body:string) => {
-      const res = registerFunction(name, body);
-      if (res.isError) {
-        throw new Error(res.error);
-      }
-      else {
-        return res.ok;
+    customFunction: {
+      register: promisify((name:string, body:string) => {
+        const res = registerFunction(name, body);
+        if (res.isError) {
+          throw new Error(res.error);
+        }
+        else {
+          return res.ok;
+        }
+      }),
+      registerOnEvent: promisify((eventName:string, body:string) => {
+        const res = registerFunctionOnEvent(eventName, body);
+        if (res.isError) {
+          throw new Error(res.error);
+        }
+        else {
+          return res.ok;
+        }
+      }),
+      execute: (name:string, ...args:any[]) => {
+        return executeRegisteredFunction(name, args).then(res => {
+          if (res.isError) {
+            throw new Error(res.error);
+          }
+          else {
+            return res.ok;
+          }
+        })
       }
     },
-    registerFunctionOnEvent: (eventName:string, body:string) => {
-      const res = registerFunctionOnEvent(eventName, body);
-      if (res.isError) {
-        throw new Error(res.error);
-      }
-      else {
-        return res.ok;
-      }
-    },
-    runRegisteredFunction: (name:string) => {
-      const res = runRegisteredFunction(name);
-      if (res.isError) {
-        throw new Error(res.error);
-      }
-      else {
-        return res.ok;
-      }
-    },
-    alert: window.editorObject.Alert,
-    getDirtyState: window.editorObject.GetDirtyState,
-    nextPage: window.editorObject.NextPage,
-    previousPage: window.editorObject.PreviousPage,
-    setSelectedPage: window.editorObject.SetSelectedPage,
-    getSelectedPage: window.editorObject.GetSelectedPage,
-    getSelectedPageName: window.editorObject.GetSelectedPageName,
-    getNumPages: window.editorObject.GetNumPages,
-    removeListener: window.editorObject.RemoveListener,
-    addListener: window.editorObject.AddListener,
-    getObject: window.editorObject.GetObject,
-    setProperty: window.editorObject.SetProperty,
-    executeFunction: window.editorObject.ExecuteFunction,
-    getPageSnapshot: window.editorObject.GetPageSnapshot,
-    getFrameSnapshot: window.editorObject.GetFrameSnapshot,
-    getFrameSubjectArea: window.editorObject.GetFrameSubjectArea,
-    setFrameSubjectArea: window.editorObject.SetFrameSubjectArea,
-    clearFrameSubjectArea: window.editorObject.ClearFrameSubjectArea,
-    getAssetSubjectInfo: window.editorObject.GetAssetSubjectInfo,
-    setAssetSubjectInfo: window.editorObject.SetAssetSubjectInfo,
-    clearAssetSubjectInfo: window.editorObject.ClearAssetSubjectInfo,
-    setVariableIsLocked: window.editorObject.SetVariableIsLocked,
-    editorObject: window.editorObject
+    alert: promisify(window.editorObject.Alert),
+    getDirtyState: promisify(window.editorObject.GetDirtyState),
+    nextPage: promisify(window.editorObject.NextPage),
+    previousPage: promisify(window.editorObject.PreviousPage),
+    setSelectedPage: promisify(window.editorObject.SetSelectedPage),
+    getSelectedPage: promisify(window.editorObject.GetSelectedPage),
+    getSelectedPageName: promisify(window.editorObject.GetSelectedPageName),
+    getNumPages: promisify(window.editorObject.GetNumPages),
+    removeListener: promisify(removeListenerShim),
+    addListener: promisify(addListenerShim),
+    getObject: promisify(window.editorObject.GetObject),
+    setProperty: promisify(window.editorObject.SetProperty),
+    executeFunction: promisify(window.editorObject.ExecuteFunction),
+    getPageSnapshot: promisify(window.editorObject.GetPageSnapshot),
+    getFrameSnapshot: promisify(window.editorObject.GetFrameSnapshot),
+    getFrameSubjectArea: promisify(window.editorObject.GetFrameSubjectArea),
+    setFrameSubjectArea: promisify(window.editorObject.SetFrameSubjectArea),
+    clearFrameSubjectArea: promisify(window.editorObject.ClearFrameSubjectArea),
+    getAssetSubjectInfo: promisify(window.editorObject.GetAssetSubjectInfo),
+    setAssetSubjectInfo: promisify(window.editorObject.SetAssetSubjectInfo),
+    clearAssetSubjectInfo: promisify(window.editorObject.ClearAssetSubjectInfo),
+    setVariableIsLocked: promisify(window.editorObject.SetVariableIsLocked),
+    editorObject: {
+      Alert: promisify(window.editorObject.Alert),
+      GetDirtyState: promisify(window.editorObject.GetDirtyState),
+      NextPage: promisify(window.editorObject.NextPage),
+      PreviousPage: promisify(window.editorObject.PreviousPage),
+      SetSelectedPage: promisify(window.editorObject.SetSelectedPage),
+      GetSelectedPage: promisify(window.editorObject.GetSelectedPage),
+      GetSelectedPageName: promisify(window.editorObject.GetSelectedPageName),
+      GetNumPages: promisify(window.editorObject.GetNumPages),
+      RemoveListener: promisify(removeListenerShim),
+      AddListener: promisify(addListenerShim),
+      GetObject: promisify(window.editorObject.GetObject),
+      SetProperty: promisify(window.editorObject.SetProperty),
+      ExecuteFunction: promisify(window.editorObject.ExecuteFunction),
+      GetPageSnapshot: promisify(window.editorObject.GetPageSnapshot),
+      GetFrameSnapshot: promisify(window.editorObject.GetFrameSnapshot),
+      GetFrameSubjectArea: promisify(window.editorObject.GetFrameSubjectArea),
+      SetFrameSubjectArea: promisify(window.editorObject.SetFrameSubjectArea),
+      ClearFrameSubjectArea: promisify(window.editorObject.ClearFrameSubjectArea),
+      GetAssetSubjectInfo: promisify(window.editorObject.GetAssetSubjectInfo),
+      SetAssetSubjectInfo: promisify(window.editorObject.SetAssetSubjectInfo),
+      ClearAssetSubjectInfo: promisify(window.editorObject.ClearAssetSubjectInfo),
+      SetVariableIsLocked: promisify(window.editorObject.SetVariableIsLocked),
+    }
   }
 
   window.OnEditorEvent = (eventName: string, id: string) => {
 
-    const eventFunc = window.registeredEventFunctions.get(eventName);
+    const registeredFunc = window.registeredEventFunctions.get(eventName);
+    if (registeredFunc != null) registeredFunc(id);
 
-    if (eventFunc != null) eventFunc(window.publisher, id);
+    const listenerFunc = window.listenerEventShimFunctions.get(eventName);
+    if (listenerFunc != null) listenerFunc(id);
 
-    connection.promise.then((parent) => {
+    connection.promise.then((parent:any) => {
       parent.handleEvents(eventName, id);
     });
   };
 };
+
+function addListenerShim(eventName:string, callbackFunction?: (targetId: string) => void) {
+  window.editorObject.AddListener(eventName);
+  if (callbackFunction != null) {
+    window.listenerEventShimFunctions.set(eventName, callbackFunction);
+  }
+}
+
+function removeListenerShim(eventName:string) {
+  window.editorObject.RemoveListener(eventName);
+  window.listenerEventShimFunctions.delete(eventName);
+}
+
+function promisify(func:any) {return (...args: any) => Promise.resolve(func(...args))}

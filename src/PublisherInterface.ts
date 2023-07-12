@@ -9,7 +9,10 @@ interface ChiliWrapper {
 
   registerFunctionOnEvent(eventName:string, body:string): Result<undefined>;
 
-  runRegisteredFunction(name: string): Result<string | number | boolean | object | null | undefined>;
+  executeRegisteredFunction(
+    name: string, 
+    args: any[]
+  ): Result<undefined>;
 
   alert(
     message: string,
@@ -48,7 +51,7 @@ interface ChiliWrapper {
   executeFunction(
     chiliPath: string,
     functionName: string,
-    params: (string | number | boolean | null | undefined)[]
+    args: (string | number | boolean | null | undefined)[]
   ):
     | Result<string | number | boolean | object | null | undefined>;
 
@@ -130,7 +133,75 @@ export type buildOptions = {
   events?:(string|{name:string, func?:(targetId: string) => void})[]
 }
 
+export type CustomFunctionsInterface = {
+    /**
+   * Register a custom function on the iframe window side. The function takes a parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
+   * 
+   * @param name - The name of the function to register.
+   * @param body - The body of the function.
+   */
+  register: (name:string, body:string) => Promise<void>,
+
+  /**
+   * Register a custom function on the iframe window side that runs when an event is called. The function takes two parameters: publisher and targetID. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
+   * 
+   * @param eventName - The name of the event to trigger the function.
+   * @param body - The body of the function.
+   */
+  registerOnEvent: (eventName:string, body:string) => Promise<void>,
+
+  /**
+   * Executes a function that was registered originally by registerFunction on the iframe window side and allows you to pass any number of args. It will return the result of the called function.
+   * 
+   * @param name - The name of the function to run.
+   * @param args - Arguments that will be passed to the function
+   */
+    execute: (name: string, ...args:any) => Promise<any>
+}
+
+
+const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(log:string)=>void):CustomFunctionsInterface {
+  return {
+
+    register: async function(name:string, body:string): Promise<void> {
+      createDebugLog("registerFunction()");
+      const response = await chiliWrapper.registerFunction(name, body);
+      if (response.isError) {
+        throw new Error(response.error)
+      }
+    },
+  
+    registerOnEvent: async function(eventName:string, body:string): Promise<void> {
+      createDebugLog("registerFunction()");
+      const response = await chiliWrapper.registerFunctionOnEvent(eventName, body);
+      if (response.isError) {
+        throw new Error(response.error)
+      }
+    },
+  
+    execute: async function(name: string, ...args:any): Promise<any> {
+      createDebugLog("executeRegisteredFunction()");
+      const response = await chiliWrapper.executeRegisteredFunction(name, args);
+      if (response.isError) {
+        throw new Error(response.error);
+      }
+      return response.ok;
+    }
+  }
+}
+
 export class PublisherInterface {
+  public customFunction: CustomFunctionsInterface = {
+    register: function (name: string, body: string): Promise<void> {
+      throw new Error("Function not implemented.");
+    },
+    registerOnEvent: function (eventName: string, body: string): Promise<void> {
+      throw new Error("Function not implemented.");
+    },
+    execute: function (name: string, args:any[]): Promise<any> {
+      throw new Error("Function not implemented.");
+    }
+  };
   private child!: AsyncMethodReturns<ChiliWrapper>;
   private chiliEventListenerCallbacks: Map<string, (targetId: string) => void> =
       new Map<string, (targetId: string) => void>();
@@ -160,9 +231,10 @@ export class PublisherInterface {
       timeout: options.timeout,
       debug: options.penpalDebug
     }).promise;
-
+    
+    publisherInterface.customFunction = createCustomFunctionsInterface(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
     publisherInterface.debug = options.penpalDebug ?? false;
-
+    
     publisherInterface.creationTime = new Date().toLocaleString();
     publisherInterface.createDebugLog("build()");
 
@@ -232,50 +304,7 @@ export class PublisherInterface {
 
     return this.#editorObject;
   }
-
-  /**
-   * Register a custom function on the iframe side. The function takes one parameter: publisher. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map. 
-   * 
-   * @param name - The name of the function to register.
-   * @param body - The body of the function.
-   */
-  public async registerFunction(name:string, body:string): Promise<void> {
-    this.createDebugLog("registerFunction()");
-    const response = await this.child.registerFunction(name, body);
-    if (response.isError) {
-      throw new Error(response.error)
-    }
-  }
-
-  /**
-   * Register a custom function on the iframe side that runs when an event is called. The function takes two parameters: publisher and id. This function has access to the window. You can access other custom functions registered using window.registeredFunctions, which is a Map.
-   * 
-   * @param eventName - The name of the event to trigger the function.
-   * @param body - The body of the function.
-   */
-  public async registerFunctionOnEvent(eventName:string, body:string): Promise<void> {
-    this.createDebugLog("registerFunction()");
-    const response = await this.child.registerFunctionOnEvent(eventName, body);
-    if (response.isError) {
-      throw new Error(response.error)
-    }
-  }
-
-
-  /**
-   * Runs function that was registered originally by reisterFunction on the iframe side.
-   * 
-   * @param name - The name of the functin to run.
-   */
-  public async runRegisteredFunction(name: string): Promise<string | number | boolean | object | null | undefined> {
-    this.createDebugLog("runReisteredFunction()");
-    const response = await this.child.runRegisteredFunction(name);
-    if (response.isError) {
-      throw new Error(response.error);
-    }
-    return response.ok;
-  }
-
+  
   /**
    * Displays a modal box within the editor UI containing a title with a message.
    *
@@ -411,12 +440,12 @@ export class PublisherInterface {
    */
   public async addListener(
     eventName: string,
-    callbackFunction?: (targetId: string) => void
+    callbackFunction?: (target: string) => void
   ): Promise<void> {
 
     this.createDebugLog("addListener()");
-    this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetId) => {
-      if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetId)
+    this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetID) => {
+      if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetID)
     } : callbackFunction)
 
     const response = await this.child.addListener(eventName);
@@ -476,19 +505,19 @@ export class PublisherInterface {
    * ```
    * @param chiliPath - A case-sensitive string query path for selecting properties and objects in a CHILI document.
    * @param functionName - A case-sensitive string of the name of the function to execute.
-   * @param params - Parameters to be passed to function of functionName.
+   * @param args - Parameters to be passed to function of functionName.
    * @returns Returns the return of executed function.
    */
   public async executeFunction(
     chiliPath: string,
     functionName: string,
-    ...params: (string | number | boolean | null | undefined)[]
+    ...args: (string | number | boolean | null | undefined)[]
   ): Promise<string | number | boolean | object | null | undefined> {
     this.createDebugLog("executeFunction()");
     const response = await this.child.executeFunction(
       chiliPath,
       functionName,
-      params
+      args
     );
     if (response.isError) {
       throw new Error(response.error)
