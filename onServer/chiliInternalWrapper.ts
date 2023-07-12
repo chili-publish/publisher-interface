@@ -6,7 +6,7 @@ declare const window: Window &
     editorObject: any;
     OnEditorEvent: any;
     publisher: any;
-    registeredFunctions: Map<string, (publisher:any, args:any[]) => void>;
+    registeredFunctions: Map<string, (publisher:any, ...args:any) => void>;
     registeredEventFunctions: Map<string, (publisher:any, id:string) => void>;
     listenerEventShimFunctions: Map<string, (id:string) => void>;
   };
@@ -50,7 +50,7 @@ const executeRegisteredFunction = (name:string, args:any[]) => {
   try {
     const func = window.registeredFunctions.get(name);
     if (func != null) {
-      return Promise.resolve(func(window.publisher, args)).then(res => Ok(res), err => Err((err as Error).toString()))
+      return Promise.resolve(func(window.publisher, ...args)).then(res => Ok(res), err => Err((err as Error).toString()))
     }
     return Promise.resolve(Err(`Function ${name} not found`));
   }
@@ -386,7 +386,7 @@ const setUpConnection = () => {
           return res.ok;
         }
       }),
-      execute: (name:string, args:any[]) => {
+      execute: (name:string, ...args:any[]) => {
         return executeRegisteredFunction(name, args).then(res => {
           if (res.isError) {
             throw new Error(res.error);
