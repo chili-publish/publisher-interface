@@ -51,7 +51,7 @@ interface ChiliWrapper {
   executeFunction(
     chiliPath: string,
     functionName: string,
-    params: (string | number | boolean | null | undefined)[]
+    args: (string | number | boolean | null | undefined)[]
   ):
     | Result<string | number | boolean | object | null | undefined>;
 
@@ -154,9 +154,9 @@ export type CustomFunctionsInterface = {
    * Executes a function that was registered originally by registerFunction on the iframe window side and allows you to pass any number of args. It will return the result of the called function.
    * 
    * @param name - The name of the function to run.
-   * @param args - An array that will be passed to the function - items in array need survive JSON.stringify
+   * @param args - Arguments that will be passed to the function
    */
-    execute: (name: string, args:any[]) => Promise<any>
+    execute: (name: string, ...args:any) => Promise<any>
 }
 
 
@@ -179,7 +179,7 @@ const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<
       }
     },
   
-    execute: async function(name: string, args:any[] = []): Promise<any> {
+    execute: async function(name: string, ...args:any): Promise<any> {
       createDebugLog("executeRegisteredFunction()");
       const response = await chiliWrapper.executeRegisteredFunction(name, args);
       if (response.isError) {
@@ -505,19 +505,19 @@ export class PublisherInterface {
    * ```
    * @param chiliPath - A case-sensitive string query path for selecting properties and objects in a CHILI document.
    * @param functionName - A case-sensitive string of the name of the function to execute.
-   * @param params - Parameters to be passed to function of functionName.
+   * @param args - Parameters to be passed to function of functionName.
    * @returns Returns the return of executed function.
    */
   public async executeFunction(
     chiliPath: string,
     functionName: string,
-    ...params: (string | number | boolean | null | undefined)[]
+    ...args: (string | number | boolean | null | undefined)[]
   ): Promise<string | number | boolean | object | null | undefined> {
     this.createDebugLog("executeFunction()");
     const response = await this.child.executeFunction(
       chiliPath,
       functionName,
-      params
+      args
     );
     if (response.isError) {
       throw new Error(response.error)

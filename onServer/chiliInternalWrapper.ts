@@ -6,8 +6,8 @@ declare const window: Window &
     editorObject: any;
     OnEditorEvent: any;
     publisher: any;
-    registeredFunctions: Map<string, (publisher:any, args:any[]) => void>;
-    registeredEventFunctions: Map<string, (publisher:any, id:string) => void>;
+    registeredFunctions: Map<string, (...args:any) => void>;
+    registeredEventFunctions: Map<string, (id:string) => void>;
     listenerEventShimFunctions: Map<string, (id:string) => void>;
   };
 
@@ -27,7 +27,7 @@ const editorCheck = setInterval(() => {
 
 const registerFunction = (name:string, body:string) => {
   try {
-    window.registeredFunctions.set(name, new Function("publisher", "args", body) as any);
+    window.registeredFunctions.set(name, new Function(body) as any);
     return Ok(undefined);
   }
   catch(e) {
@@ -38,7 +38,7 @@ const registerFunction = (name:string, body:string) => {
 const registerFunctionOnEvent = (eventName:string, body:string) => {
   try {
     window.editorObject.AddListener(eventName);
-    window.registeredEventFunctions.set(eventName, new Function("publisher", "targetID", body) as any);
+    window.registeredEventFunctions.set(eventName, new Function("targetID", body) as any);
     return Ok(undefined);
   }
   catch(e) {
@@ -50,7 +50,7 @@ const executeRegisteredFunction = (name:string, args:any[]) => {
   try {
     const func = window.registeredFunctions.get(name);
     if (func != null) {
-      return Promise.resolve(func(window.publisher, args)).then(res => Ok(res), err => Err((err as Error).toString()))
+      return Promise.resolve(func(...args)).then(res => Ok(res), err => Err((err as Error).toString()))
     }
     return Promise.resolve(Err(`Function ${name} not found`));
   }
@@ -180,13 +180,13 @@ const setProperty = (
 const executeFunction = (
   chiliPath: string,
   functionName: string,
-  params: (string | number | boolean | null | undefined)[]
+  args: (string | number | boolean | null | undefined)[]
 ): Result<string | number | boolean | object | null | undefined> => {
   try {
     return Ok(window.editorObject.ExecuteFunction(
       chiliPath,
       functionName,
-      ...params
+      ...args
     ));
   } catch (e) {
     return Err((e as Error).toString());
@@ -386,7 +386,7 @@ const setUpConnection = () => {
           return res.ok;
         }
       }),
-      execute: (name:string, args:any[]) => {
+      execute: (name:string, ...args:any[]) => {
         return executeRegisteredFunction(name, args).then(res => {
           if (res.isError) {
             throw new Error(res.error);
@@ -448,7 +448,7 @@ const setUpConnection = () => {
   window.OnEditorEvent = (eventName: string, id: string) => {
 
     const registeredFunc = window.registeredEventFunctions.get(eventName);
-    if (registeredFunc != null) registeredFunc(window.publisher, id);
+    if (registeredFunc != null) registeredFunc(id);
 
     const listenerFunc = window.listenerEventShimFunctions.get(eventName);
     if (listenerFunc != null) listenerFunc(id);
@@ -460,12 +460,14 @@ const setUpConnection = () => {
 };
 
 function addListenerShim(eventName:string, callbackFunction?: (targetId: string) => void) {
-  window.editorObject.addListener(eventName);
-  window.listenerEventShimFunctions.set(eventName, callbackFunction ?? ((t) => {return}));
+  window.editorObject.AddListener(eventName);
+  if (callbackFunction != null) {
+    window.listenerEventShimFunctions.set(eventName, callbackFunction);
+  }
 }
 
 function removeListenerShim(eventName:string) {
-  window.editorObject.removeListener(eventName);
+  window.editorObject.RemoveListener(eventName);
   window.listenerEventShimFunctions.delete(eventName);
 }
 
