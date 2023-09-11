@@ -118,7 +118,29 @@ interface ChiliWrapper {
 }
 
 
-export type buildOptions = {
+export type buildOptions = ({
+  /** 
+   * iframe element to the PublisherInterface will try to connect with
+  */
+  iframe:HTMLIFrameElement,
+  /**
+   * The url that will be set on the iframe - this needs to be a valid URL with a valid API key
+   */
+  editorURL?:string,
+  createIFrameOnElement: undefined
+
+} | {
+  iframe: undefined
+  /**
+   * The url that will be set on the iframe - this needs to be a valid URL with a valid API key
+   */
+  editorURL:string,
+  /**
+   * The element that a new iframe will be created with URL from `edtiorURL`
+   */
+  createIFrameOnElement: HTMLElement,
+})
+ & {
   /**
    * If not null, the number of milliseconds to wait for a connection to iframe before throwing an exception.
    */
@@ -126,7 +148,7 @@ export type buildOptions = {
   /**
    * If true, PublisherInterface and the underlining library penpal will log debug info in the console. Useful for debugging connection issues.
    */
-  penpalDebug?: boolean,
+  debug?: boolean,
   /**
    * Pass in an array of events that will be auto-added via `addListener()`
    */
@@ -202,6 +224,10 @@ export class PublisherInterface {
       throw new Error("Function not implemented.");
     }
   };
+  /**
+   * The IFrame element this PublisherInterface is connected with once successifully connected. Returns undefined if not connected.
+   */
+  public iframe: HTMLIFrameElement | undefined;
   private child!: AsyncMethodReturns<ChiliWrapper>;
   private chiliEventListenerCallbacks: Map<string, (targetId: string) => void> =
       new Map<string, (targetId: string) => void>();
@@ -219,8 +245,16 @@ export class PublisherInterface {
    * @param options
    * @returns {PublisherInterface}
    */
-  static async build(iframe: HTMLIFrameElement, options: buildOptions  = {}) {
+  static async build(options:buildOptions) {
     const publisherInterface = new PublisherInterface();
+
+    const iframe = options.iframe ?? document.createElement("iframe");
+    publisherInterface.iframe = iframe;
+
+    if (options.editorURL != null) {
+      iframe.src = options.editorURL;
+    }
+
     publisherInterface.child = await connectToChild<ChiliWrapper>({
       // The iframe to which a connection should be made
       iframe,
@@ -229,11 +263,15 @@ export class PublisherInterface {
         handleEvents: publisherInterface.handleEvents.bind(publisherInterface),
       },
       timeout: options.timeout,
-      debug: options.penpalDebug
+      debug: options.debug
     }).promise;
-    
+
+    if (options.iframe == null) {
+      options.createIFrameOnElement.appendChild(iframe);
+    }
+
     publisherInterface.customFunction = createCustomFunctionsInterface(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
-    publisherInterface.debug = options.penpalDebug ?? false;
+    publisherInterface.debug = options.debug ?? false;
     
     publisherInterface.creationTime = new Date().toLocaleString();
     publisherInterface.createDebugLog("build()");
