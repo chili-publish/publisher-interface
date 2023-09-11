@@ -4,32 +4,6 @@
     <script type="module">
       window.runTest = async (options) => {
 
-        // console.log(options);
-        // return options.result;
-        // const iframe = document.createElement("iframe");
-        // iframe.src = `/server/${file}.html`;
-
-        // const createInterface = async (options = {}) => {
-        //   const publisherPromise = PublisherInterface.build(iframe, {timeout:5000, ...options});
-        //   document.body.appendChild(iframe);
-        //   return publisherPromise;
-        // }
-
-        // const createTestFor = async (testName) => {
-        //   iframe.contentWindow.postMessage({addTest:true, testName}, "*");
-
-        //   return new Promise( res => {
-        //     const createTestListener = (event) => {
-        //       //testReady: true, testName: event.data.testName
-        //       if (event.data.testReady && event.data.testName == testName) {
-        //         res(testName);
-        //       }
-        //     }
-
-        //     window.addEventListener("message", createTestListener)
-        //   });
-        // }
-
         const { default: testFunction } = await import(`/client/${options.file}.js`);
         const result = await testFunction(options);
 
