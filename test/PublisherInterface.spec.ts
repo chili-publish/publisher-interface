@@ -99,7 +99,7 @@ const testsPublisherInterface = {
 }
 
 for (const name of Object.keys(testsPublisherInterface)) {
-    test("Test " + name, async ({ page }) => {
+  test("Test " + name + " [pass iframe]", async ({ page }) => {
       await page.goto("http://localhost:3001");
       const result = await page.evaluate(
         (test) => window.runTest(test),
@@ -107,4 +107,12 @@ for (const name of Object.keys(testsPublisherInterface)) {
       );
       expect(result).toBe(true);
   });
+  test("Test " + name + " [build iframe]", async ({ page }) => {
+    await page.goto("http://localhost:3001");
+    const result = await page.evaluate(
+      (test) => window.runTest(test),
+      {name, send:testsPublisherInterface[name].send, response:testsPublisherInterface[name].response, file:"publisherInterface", passIframe:false}
+    );
+    expect(result).toBe(true);
+});
 }
