@@ -247,6 +247,7 @@ export class PublisherInterface {
    */
   static async build(options:buildOptions) {
     const publisherInterface = new PublisherInterface();
+    publisherInterface.creationTime = new Date().toLocaleString();
 
     const iframe = options.iframe ?? document.createElement("iframe");
     publisherInterface.iframe = iframe;
@@ -254,8 +255,8 @@ export class PublisherInterface {
     if (options.editorURL != null) {
       iframe.src = options.editorURL;
     }
-
-    publisherInterface.child = await connectToChild<ChiliWrapper>({
+    
+    const connectionPromise = connectToChild<ChiliWrapper>({
       // The iframe to which a connection should be made
       iframe,
       // Methods the parent is exposing to the child
@@ -264,17 +265,15 @@ export class PublisherInterface {
       },
       timeout: options.timeout,
       debug: options.debug
-    }).promise;
+    })
 
-    if (options.iframe == null) {
+    if (options.createIFrameOnElement != null) {
       options.createIFrameOnElement.appendChild(iframe);
     }
 
+    publisherInterface.child = await connectionPromise.promise;
     publisherInterface.customFunction = createCustomFunctionsInterface(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
     publisherInterface.debug = options.debug ?? false;
-    
-    publisherInterface.creationTime = new Date().toLocaleString();
-    publisherInterface.createDebugLog("build()");
 
     const events = options.events;
 
