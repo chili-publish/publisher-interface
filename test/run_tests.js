@@ -33,7 +33,7 @@ async function main() {
 
   const copyPISuccess = await new Promise((res) => {
     exec(
-      "cp ./dist/PublisherInterface.min.js ./test/dist/PublisherInterface.min.js",
+      "mkdir -p ./test/dist && cp ./dist/PublisherInterface.min.js ./test/dist/PublisherInterface.min.js",
       (error, stdout, stderr) => {
         if (error) {
           res([false, error]);
