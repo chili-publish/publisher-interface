@@ -182,11 +182,11 @@ export type CustomFunctionsInterface = {
 }
 
 
-const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(log:string)=>void):CustomFunctionsInterface {
+const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<ChiliWrapper>, createDebugLog:(p:{functionName:string})=>void):CustomFunctionsInterface {
   return {
 
     register: async function(name:string, body:string): Promise<void> {
-      createDebugLog("registerFunction()");
+      createDebugLog({functionName:"registerFunction()"});
       const response = await chiliWrapper.registerFunction(name, body);
       if (response.isError) {
         throw new Error(response.error)
@@ -194,7 +194,7 @@ const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<
     },
   
     registerOnEvent: async function(eventName:string, body:string): Promise<void> {
-      createDebugLog("registerFunction()");
+      createDebugLog({functionName:"registerFunction()"});
       const response = await chiliWrapper.registerFunctionOnEvent(eventName, body);
       if (response.isError) {
         throw new Error(response.error)
@@ -202,7 +202,7 @@ const createCustomFunctionsInterface = function(chiliWrapper:AsyncMethodReturns<
     },
   
     execute: async function(name: string, ...args:any): Promise<any> {
-      createDebugLog("executeRegisteredFunction()");
+      createDebugLog({functionName:"executeRegisteredFunction()"});
       const response = await chiliWrapper.executeRegisteredFunction(name, args);
       if (response.isError) {
         throw new Error(response.error);
@@ -248,6 +248,8 @@ export class PublisherInterface {
   static async build(options:buildOptions) {
     const publisherInterface = new PublisherInterface();
     publisherInterface.creationTime = new Date().toLocaleString();
+    publisherInterface.debug = options.debug ?? false;
+    publisherInterface.createDebugLog({functionName:"build()", customMessage:"Calling build() with options: " + JSON.stringify(options)})
 
     const iframe = options.iframe ?? document.createElement("iframe");
     publisherInterface.iframe = iframe;
@@ -273,7 +275,6 @@ export class PublisherInterface {
 
     publisherInterface.child = await connectionPromise.promise;
     publisherInterface.customFunction = createCustomFunctionsInterface(publisherInterface.child, publisherInterface.createDebugLog.bind(publisherInterface));
-    publisherInterface.debug = options.debug ?? false;
 
     const events = options.events;
 
@@ -298,12 +299,17 @@ export class PublisherInterface {
   }
 
   /**
-   * Logs a function call creation if penpalDebug is enabled
+   * Logs a function call creation if debug is enabled
    * @param functionName The name of the function being executed
    */
-  private createDebugLog(functionName: string) {
+  private createDebugLog({functionName, customMessage}:{functionName: string, customMessage?:string}) {
     if (this.debug) {
-      console.log(`[PublisherInterface - ${this.creationTime}]`, `Creating ${functionName} call request`);
+      if (customMessage != null) {
+        console.log(`[PublisherInterface - ${this.creationTime}]`, `${functionName} : ${customMessage}`);
+      }
+      else {
+        console.log(`[PublisherInterface - ${this.creationTime}]`, `Creating ${functionName} call request`);
+      }
     }
   }
 
@@ -349,7 +355,7 @@ export class PublisherInterface {
    * @param title - The title/header of the modal.
    */
   public async alert(message: string, title: string): Promise<void> {
-    this.createDebugLog("alert()");
+    this.createDebugLog({functionName:"alert()"});
     const response = await this.child.alert(message, title);
     if (response.isError) {
       throw new Error(response.error)
@@ -362,7 +368,7 @@ export class PublisherInterface {
    * @returns Returns boolean to signify if the document has been changed since previous save.
    */
   public async getDirtyState(): Promise<boolean> {
-    this.createDebugLog("getDirtyState()");
+    this.createDebugLog({functionName:"getDirtyState()"});
     const response = await this.child.getDirtyState();
     if (response.isError) {
       throw new Error(response.error)
@@ -375,7 +381,7 @@ export class PublisherInterface {
    * If the current selected page has the beginning index 0 then nothing happens.
    */
   public async nextPage(): Promise<void> {
-    this.createDebugLog("nextPage()");
+    this.createDebugLog({functionName:"nextPage()"});
     const response = await this.child.nextPage();
     if (response.isError) {
       throw new Error(response.error)
@@ -387,7 +393,7 @@ export class PublisherInterface {
    * If the current selected page has the last index then nothing happens.
    */
   public async previousPage(): Promise<void> {
-    this.createDebugLog("previousPage()");
+    this.createDebugLog({functionName:"previousPage()"});
     const response = await this.child.previousPage();
     if (response.isError) {
       throw new Error(response.error)
@@ -400,7 +406,7 @@ export class PublisherInterface {
    * @param page - Common language page number (page index + 1) to select.
    */
   public async setSelectedPage(page: number): Promise<void> {
-    this.createDebugLog("setSelectedPage()");
+    this.createDebugLog({functionName:"setSelectedPage()"});
     const response = await this.child.setSelectedPage(page);
     if (response.isError) {
       throw new Error(response.error)
@@ -414,7 +420,7 @@ export class PublisherInterface {
    * @returns Page index + 1 of the selected page.
    */
   public async getSelectedPage(): Promise<number> {
-    this.createDebugLog("getSelectedPage()");
+    this.createDebugLog({functionName:"getSelectedPage()"});
     const response = await this.child.getSelectedPage();
     if (response.isError) {
       throw new Error(response.error)
@@ -428,7 +434,7 @@ export class PublisherInterface {
    * @returns Name of the page.
    */
   public async getSelectedPageName(): Promise<string> {
-    this.createDebugLog("getSelectedPageName()");
+    this.createDebugLog({functionName:"getSelectedPageName()"});
     const response = await this.child.getSelectedPageName();
     if (response.isError) {
       throw new Error(response.error)
@@ -442,7 +448,7 @@ export class PublisherInterface {
    * @returns The total number of pages.
    */
   public async getNumPages(): Promise<number> {
-    this.createDebugLog("getNumPages()");
+    this.createDebugLog({functionName:"getNumPages()"});
     const response = await this.child.getNumPages();
     if (response.isError) {
       throw new Error(response.error)
@@ -456,7 +462,7 @@ export class PublisherInterface {
    * @param eventName - A case-sensitive string representing the editor event type to stop listening to.
    */
   public async removeListener(eventName: string): Promise<void> {
-    this.createDebugLog("removeListener()");
+    this.createDebugLog({functionName:"removeListener()"});
     this.chiliEventListenerCallbacks.delete(eventName);
     const response = await this.child.removeListener(eventName);
     if (response.isError) {
@@ -480,7 +486,7 @@ export class PublisherInterface {
     callbackFunction?: (target: string) => void
   ): Promise<void> {
 
-    this.createDebugLog("addListener()");
+    this.createDebugLog({functionName:"addListener()"});
     this.chiliEventListenerCallbacks.set(eventName, callbackFunction == null ? (targetID) => {
       if (window.OnEditorEvent != null) window.OnEditorEvent(eventName, targetID)
     } : callbackFunction)
@@ -500,7 +506,7 @@ export class PublisherInterface {
   public async getObject(
     chiliPath: string
   ): Promise<string | number | boolean | object | null | undefined> {
-    this.createDebugLog("getObject()");
+    this.createDebugLog({functionName:"getObject()"});
     const response = await this.child.getObject(chiliPath);
     if (response.isError) {
       throw new Error(response.error)
@@ -525,7 +531,7 @@ export class PublisherInterface {
     property: string,
     value: string | number | boolean | null
   ): Promise<void> {
-    this.createDebugLog("setProperty()");
+    this.createDebugLog({functionName:"setProperty()"});
     const response = await this.child.setProperty(chiliPath, property, value);
     if (response.isError) {
       throw new Error(response.error)
@@ -550,7 +556,7 @@ export class PublisherInterface {
     functionName: string,
     ...args: (string | number | boolean | null | undefined)[]
   ): Promise<string | number | boolean | object | null | undefined> {
-    this.createDebugLog("executeFunction()");
+    this.createDebugLog({functionName:"executeFunction()"});
     const response = await this.child.executeFunction(
       chiliPath,
       functionName,
@@ -593,7 +599,7 @@ export class PublisherInterface {
     viewMode: "preview" | "edit" | "technical",
     transparentBackground: boolean
   ): Promise<string> {
-    this.createDebugLog("getPageSnapshot()");
+    this.createDebugLog({functionName:"getPageSnapshot()"});
     const response = await this.child.getPageSnapshot(
       pageIndex,
       size,
@@ -621,7 +627,7 @@ export class PublisherInterface {
     size: string | { width: number; height: number } | number,
     transparentBackground: boolean
   ): Promise<string> {
-    this.createDebugLog("getFrameSnapshot()");
+    this.createDebugLog({functionName:"getFrameSnapshot()"});
     const response = await this.child.getFrameSnapshot(
       idOrTag,
       size,
@@ -642,7 +648,7 @@ export class PublisherInterface {
   public async getFrameSubjectArea(
     idOrTag: string
   ): Promise<{ height: string; width: string; x: string; y: string }> {
-    this.createDebugLog("getFrameSubjectArea()");
+    this.createDebugLog({functionName:"getFrameSubjectArea()"});
     const response = await this.child.getFrameSubjectArea(idOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -666,7 +672,7 @@ export class PublisherInterface {
     width: number,
     height: number
   ): Promise<void> {
-    this.createDebugLog("setFrameSubjectArea()");
+    this.createDebugLog({functionName:"setFrameSubjectArea()"});
     const response = await this.child.setFrameSubjectArea(
       idOrTag,
       x,
@@ -685,7 +691,7 @@ export class PublisherInterface {
    * @param idOrTag - The string id or tag of the frame to clear the subject area.
    */
   public async clearFrameSubjectArea(idOrTag: string): Promise<void> {
-    this.createDebugLog("clearFrameSubjectArea()");
+    this.createDebugLog({functionName:"clearFrameSubjectArea()"});
     const response = await this.child.clearFrameSubjectArea(idOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -706,7 +712,7 @@ export class PublisherInterface {
     poiX: string;
     poiY: string;
   }> {
-    this.createDebugLog("getAssetSubjectInfo()");
+    this.createDebugLog({functionName:"getAssetSubjectInfo()"});
     const response = await this.child.getAssetSubjectInfo(frameIdOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -734,7 +740,7 @@ export class PublisherInterface {
     poiX: number,
     poiY: number
   ): Promise<void> {
-    this.createDebugLog("setAssetSubjectInfo()");
+    this.createDebugLog({functionName:"setAssetSubjectInfo()"});
     const response = await this.child.setAssetSubjectInfo(
       frameIdOrTag,
       x,
@@ -755,7 +761,7 @@ export class PublisherInterface {
    * @param frameIdOrTag - The string id or tag of the frame to clear the asset subject area.
    */
   public async clearAssetSubjectInfo(frameIdOrTag: string): Promise<void> {
-    this.createDebugLog("clearAssetSubjectInfo()");
+    this.createDebugLog({functionName:"clearAssetSubjectInfo()"});
     const response = await this.child.clearAssetSubjectInfo(frameIdOrTag);
     if (response.isError) {
       throw new Error(response.error)
@@ -772,7 +778,7 @@ export class PublisherInterface {
     variableName: string,
     isLocked: boolean
   ): Promise<void> {
-    this.createDebugLog("setVariableIsLocked()");
+    this.createDebugLog({functionName:"setVariableIsLocked()"});
     const response = await this.child.setVariableIsLocked(
       variableName,
       isLocked
