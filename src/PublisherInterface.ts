@@ -117,20 +117,35 @@ interface ChiliWrapper {
   ): Result<undefined>;
 }
 
+export type commonBuildOptions = {
+    /**
+     * If not null, the number of milliseconds to wait for a connection to iframe before throwing an exception.
+     */
+    timeout?: number,
+    /**
+     * If true, PublisherInterface and the underlining library penpal will log debug info in the console. Useful for debugging connection issues.
+     */
+    debug?: boolean,
+    /**
+     * Pass in an array of events that will be auto-added via `addListener()`
+     */
+    events?:(string|{name:string, func?:(targetId: string) => void})[]
+  }
 
-export type buildOptions = ({
+
+export type allBuildOptions = ({
   /** 
    * iframe element to the PublisherInterface will try to connect with
   */
-  iframe:HTMLIFrameElement,
+  targetIFrame:HTMLIFrameElement,
   /**
    * The url that will be set on the iframe - this needs to be a valid URL with a valid API key
    */
   editorURL?:string,
-  createIFrameOnElement: undefined
+  parentElement?: undefined
 
 } | {
-  iframe: undefined
+  targetIFrame?: undefined
   /**
    * The url that will be set on the iframe - this needs to be a valid URL with a valid API key
    */
@@ -138,22 +153,9 @@ export type buildOptions = ({
   /**
    * The element that a new iframe will be created with URL from `edtiorURL`
    */
-  createIFrameOnElement: HTMLElement,
+  parentElement: HTMLElement,
 })
- & {
-  /**
-   * If not null, the number of milliseconds to wait for a connection to iframe before throwing an exception.
-   */
-  timeout?: number,
-  /**
-   * If true, PublisherInterface and the underlining library penpal will log debug info in the console. Useful for debugging connection issues.
-   */
-  debug?: boolean,
-  /**
-   * Pass in an array of events that will be auto-added via `addListener()`
-   */
-  events?:(string|{name:string, func?:(targetId: string) => void})[]
-}
+ & commonBuildOptions
 
 export type CustomFunctionsInterface = {
     /**
@@ -238,6 +240,14 @@ export class PublisherInterface {
   private constructor() {
   }
 
+  static async buildWithIFrame(targetIFrame:HTMLIFrameElement, options:commonBuildOptions) {
+    return PublisherInterface.build({targetIFrame, ...options})
+  }
+
+  static async buildOnElement(parentElement:HTMLElement, editorURL:string, options:commonBuildOptions) {
+    return PublisherInterface.build({parentElement, editorURL, ...options})
+  }
+
   /**
    * The build method will wait for a connection to the other side of iframe. Must be called before iframe `onload` event is fired.
    *
@@ -245,13 +255,13 @@ export class PublisherInterface {
    * @param options
    * @returns {PublisherInterface}
    */
-  static async build(options:buildOptions) {
+  static async build(options:allBuildOptions) {
     const publisherInterface = new PublisherInterface();
     publisherInterface.creationTime = new Date().toLocaleString();
     publisherInterface.debug = options.debug ?? false;
     publisherInterface.createDebugLog({functionName:"build()", customMessage:"Calling build() with options: " + JSON.stringify(options)})
 
-    const iframe = options.iframe ?? document.createElement("iframe");
+    const iframe = options.targetIFrame ?? document.createElement("iframe");
     publisherInterface.iframe = iframe;
 
     if (options.editorURL != null) {
@@ -269,8 +279,8 @@ export class PublisherInterface {
       debug: options.debug
     })
 
-    if (options.createIFrameOnElement != null) {
-      options.createIFrameOnElement.appendChild(iframe);
+    if (options.parentElement != null) {
+      options.parentElement.appendChild(iframe);
     }
 
     publisherInterface.child = await connectionPromise.promise;
