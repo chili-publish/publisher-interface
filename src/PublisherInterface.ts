@@ -256,6 +256,16 @@ export class PublisherInterface {
    * @returns {PublisherInterface}
    */
   static async build(options:allBuildOptions) {
+    
+    // Supporting code that is expecting pre 1.0 behavior
+    if (arguments[0].tagName == "IFRAME"){
+      options = {
+        ...arguments[1],
+        targetIframe: arguments[0],
+        debug: arguments[1]["penpalDebug"]
+      }
+    }
+    
     const publisherInterface = new PublisherInterface();
     publisherInterface.creationTime = new Date().toLocaleString();
     publisherInterface.debug = options.debug ?? false;
