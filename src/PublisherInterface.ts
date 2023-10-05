@@ -137,7 +137,7 @@ export type allBuildOptions = ({
   /** 
    * iframe element to the PublisherInterface will try to connect with
   */
-  targetIFrame:HTMLIFrameElement,
+  targetIframe:HTMLIFrameElement,
   /**
    * The url that will be set on the iframe - this needs to be a valid URL with a valid API key
    */
@@ -145,7 +145,7 @@ export type allBuildOptions = ({
   parentElement?: undefined
 
 } | {
-  targetIFrame?: undefined
+  targetIframe?: undefined
   /**
    * The url that will be set on the iframe - this needs to be a valid URL with a valid API key
    */
@@ -240,8 +240,8 @@ export class PublisherInterface {
   private constructor() {
   }
 
-  static async buildWithIFrame(targetIFrame:HTMLIFrameElement, options:commonBuildOptions) {
-    return PublisherInterface.build({targetIFrame, ...options})
+  static async buildWithIframe(targetIframe:HTMLIFrameElement, options:commonBuildOptions) {
+    return PublisherInterface.build({targetIframe, ...options})
   }
 
   static async buildOnElement(parentElement:HTMLElement, editorURL:string, options:commonBuildOptions) {
@@ -261,7 +261,7 @@ export class PublisherInterface {
     publisherInterface.debug = options.debug ?? false;
     publisherInterface.createDebugLog({functionName:"build()", customMessage:"Calling build() with options: " + JSON.stringify(options)})
 
-    const iframe = options.targetIFrame ?? document.createElement("iframe");
+    const iframe = options.targetIframe ?? document.createElement("iframe");
     publisherInterface.iframe = iframe;
 
     if (options.editorURL != null) {
