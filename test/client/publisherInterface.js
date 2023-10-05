@@ -1,7 +1,7 @@
 import {PublisherInterface} from "../dist/PublisherInterface.min.js";
 import {deepEqual} from "./deepEqual.js"
 
-export default async function ({name, send, response, passIframe = true}) {
+export default async function ({name, send, response, passIframe}) {
   
   const publisher = await createInterface(passIframe)
   await createTestFor(name, response, publisher.iframe);
@@ -40,16 +40,25 @@ async function createTestFor(name, response, iframe) {
 
 async function createInterface(passIframe) {
 
-  if (passIframe){
-    const iframe = document.createElement("iframe");
-    iframe.src = `/server/publisherInterface.html`;
+  switch (passIframe) {
+    case "preV1": {
+      const iframe = document.createElement("iframe");
+      iframe.src = `/server/publisherInterface.html`;
 
-    const publisherPromise = PublisherInterface.build({iframe:iframe, timeout:5000});
-    document.body.appendChild(iframe);
-    return publisherPromise;
-  }
-  else {
-    return PublisherInterface.build({createIFrameOnElement:document.body, editorURL: `/server/publisherInterface.html`, timeout:5000});
+      const publisherPromise = PublisherInterface.build(iframe, {timeout:5000});
+      document.body.appendChild(iframe);
+      return publisherPromise;
+    }
+    case "postV1": {
+      const iframe = document.createElement("iframe");
+      iframe.src = `/server/publisherInterface.html`;
+
+      const publisherPromise = PublisherInterface.buildWithIframe(iframe, {timeout:5000});
+      document.body.appendChild(iframe);
+      return publisherPromise;
+    }
+    default:
+    return PublisherInterface.buildOnElement(document.body, `/server/publisherInterface.html`, {timeout:5000});
   }
 }
 
