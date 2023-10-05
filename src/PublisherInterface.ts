@@ -259,10 +259,13 @@ export class PublisherInterface {
     
     // Supporting code that is expecting pre 1.0 behavior
     if (arguments[0].tagName == "IFRAME"){
+
+      const originalOptions = arguments[1] ?? {};
+
       options = {
-        ...arguments[1],
+        ...originalOptions,
         targetIframe: arguments[0],
-        debug: arguments[1]["penpalDebug"]
+        debug: options.debug ?? originalOptions["penpalDebug"]
       }
     }
     
