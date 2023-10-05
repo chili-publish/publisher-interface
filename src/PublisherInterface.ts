@@ -117,7 +117,7 @@ interface ChiliWrapper {
   ): Result<undefined>;
 }
 
-export type commonBuildOptions = {
+export type CommonBuildOptions = {
     /**
      * If not null, the number of milliseconds to wait for a connection to iframe before throwing an exception.
      */
@@ -133,7 +133,7 @@ export type commonBuildOptions = {
   }
 
 
-export type allBuildOptions = ({
+export type AllBuildOptions = ({
   /** 
    * iframe element to the PublisherInterface will try to connect with
   */
@@ -155,7 +155,7 @@ export type allBuildOptions = ({
    */
   parentElement: HTMLElement,
 })
- & commonBuildOptions
+ & CommonBuildOptions
 
 export type CustomFunctionsInterface = {
     /**
@@ -240,11 +240,11 @@ export class PublisherInterface {
   private constructor() {
   }
 
-  static async buildWithIframe(targetIframe:HTMLIFrameElement, options:commonBuildOptions) {
+  static async buildWithIframe(targetIframe:HTMLIFrameElement, options:CommonBuildOptions) {
     return PublisherInterface.build({targetIframe, ...options})
   }
 
-  static async buildOnElement(parentElement:HTMLElement, editorURL:string, options:commonBuildOptions) {
+  static async buildOnElement(parentElement:HTMLElement, editorURL:string, options:CommonBuildOptions) {
     return PublisherInterface.build({parentElement, editorURL, ...options})
   }
 
@@ -255,7 +255,7 @@ export class PublisherInterface {
    * @param options
    * @returns {PublisherInterface}
    */
-  static async build(options:allBuildOptions) {
+  static async build(options:AllBuildOptions) {
     
     // Supporting code that is expecting pre 1.0 behavior
     if (arguments[0].tagName == "IFRAME"){
