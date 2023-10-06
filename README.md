@@ -5,7 +5,7 @@ Notes:
 - The Publisher JavaScript API has maintained stability for years. Thus this library reaching major version 1.x signifies that future updates will primarily address bug fixes, and should be rare. In this case, no updates is a good sign.
 - Some use cases may not be supported by Publisher Interface. Refer to [here]() for unsupported use cases.
 - Previously named Publisher Connector, the project has been renamed to Publisher Interface to avert confusion with future connectors plugin systems. Please update your project if you utilized the old name and library.
-- As of 2023, this is the only officially support way to integrate CHILI GraFx Publisher.
+- As of 2023, this is the only officially supported way to integrate CHILI GraFx Publisher.
 
 <br/>
 
