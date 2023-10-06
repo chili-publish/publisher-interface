@@ -1,151 +1,187 @@
-# Publisher Interface
-The Publisher Interface was designed to make integrating into CHILI publish Online easy.
+# CHILI Publisher Interface
+The **Publisher Interface** library simplifies integration with CHILI GraFx Publisher by providing a straightforward means to interact with the editorObject via postMessage. This library greatly simplifies the complexity of dealing with the same-origin policy in all browsers including Chromium-based browsers.
 
-As a happy side effect, the setter for `document.domain`, which many integrations rely on, will become immutable at the beginning of January 2023. This means that the Publisher Interface will be the only supported way to communicate with Publisher via an `<iframe>`.
+Notes:
+- The Publisher JavaScript API has maintained stability for years. Thus this library reaching major version 1.x signifies that future updates will primarily address bug fixes, and should be rare. In this case, no updates is a good sign.
+- Some use cases may not be supported by Publisher Interface. Refer to [here]() for unsupported use cases.
+- Previously named Publisher Connector, the project has been renamed to Publisher Interface to avert confusion with future connectors plugin systems. Please update your project if you utilized the old name and library.
+- As of 2023, this is the only officially supported way to integrate CHILI GraFx Publisher.
 
-All the magic happens with `PublisherInterface` PublisherInterface is a class object that allows you to interact with the CHILI Editor editorObject via postMessage without the complexity of postMessage.
+<br/>
 
 This project is officially supported by [CHILI publish](https://chili-publish.com).
 
-Notes:
-* The Publisher JavaScript API has been stable for years, and there is no plans to add to it. So this project may not get many updates. That is a good thing, it means there is no bugs.
-* Originally this project was called Publisher Connector. The name was changed to avoid confusion with the future connectors plugin system. Please update your projects if you were using the old naming convention and library.
+## Contents
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Debugging](#debugging)
 
-## Documentation
-You can find complete documentation on the [wiki](https://github.com/chili-publish/publisher-interface/wiki)
-* [Installation](#installation) - Easy npm install.
-* [Getting Started](#getting-started) - A very quick tutorial to get you started.
-* [Debugging](#debugging) - Things gone wrong, check this out.
-* [Integrating Publisher](https://github.com/chili-publish/publisher-interface/wiki/Integrating-Publisher) - A much longer tutorial for those starting a new project with Publisher.
-* [Why I Cannot Use editorObject](https://github.com/chili-publish/publisher-interface/wiki/Why-I-Cannot-Use-editorObject) - A description of why `editorObject` can no longer be used when communicating with an `<iframe>`.
-* [Differences With editorObject](https://github.com/chili-publish/publisher-interface/wiki/Differences-With-editorObject) - All the differences between `PublisherInterface` and `editorObject`.
-* [Moving to Publisher Interface](https://github.com/chili-publish/publisher-interface/wiki/Moving-to-Publisher-Interface) - A guide for those who already have a project with Publisher and are now converting their current integration from `editorObject` to Publisher Interface.
-* [Big List of JavaScript Use Cases](https://github.com/chili-publish/publisher-interface/wiki/Big-List-of-JavaScript-Use-Cases) - A very long list of JavaScript use cases. [WIP]
-* [API Documentation](https://github.com/chili-publish/publisher-interface/wiki/API-Docs) - auto-generated documentation of the `PublisherInterface` class and associated types. Even though it is auto-generated, the comments therein were written with insight.
+<br/>
+
+📘 **Full documentation** is available on the [wiki](https://github.com/chili-publish/publisher-interface/wiki).
 
 ## Installation
-You can install PublisherInterface via npm
+Install Publisher Interface using npm, yarn, bun, or directly in the browser via unpkg.
 
-```
-npm i @chili-publish/publisher-interface
-```
-
-<br/>
-
-or through yarn
-```
-yarn add @chili-publish/publisher-interface
-```
-
-<br/>
-
-You can also use it directly in the browser via unpkg.
 ```javascript
+// npm
+npm i @chili-publish/publisher-interface
+
+// yarn
+yarn add @chili-publish/publisher-interface
+
+// bun
+bun install @chili-publish/publisher-interface
+
+// browser
 import {PublisherInterface} from "https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js";
 ```
 
 ## Dependencies
 The Publisher Interface has 1 dependency which is the [Penpal](https://github.com/Aaronius/penpal) library.
 
-All other dependencies are only for the developer tools such as auto generating docs, testing, and packaging.
+All other dependencies are only for the developer tools such as auto generating docs, testing, and packaging. Developer dependencies will not always be up-to-date, and that is okay because our focus is to keep to keep the package up-to-date , and the developer tools only when releasing a new version.
 
-This means that their is very little security concerns, and the limitations are the same as those found in [Penpal](https://github.com/Aaronius/penpal)
+This means that there are very little security concerns, and the limitations are the same as those found in [Penpal](https://github.com/Aaronius/penpal)
 
 ### Browser Support
 
-Publisher Interface runs successfully on the most recent versions of Chrome, Firefox, Safari, and Edge. Internet Explorer is
-not supported.
-
-## Getting Started
-The easiest way to get started is to pull the package from unpkg.
-
-```javascript
-import {PublisherInterface} from "https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js";
-```
+Publisher Interface runs successfully on CHILI GraFx and any version greater on or above 6.5.5. It is also built to run on the most recent versions of Chrome, Firefox, Safari, and Edge. Internet Explorer is not supported.
 
 <br/>
 
-If you downloaded via NPM you can import it with
+# Getting Started
+Begin by pulling the package from unpkg, or import it if installed via NPM, yarn, or bun.
+
 ```javascript
+//unpkg
+import {PublisherInterface} from "https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js";
+
+// npm, yarn, bun
 import {PublisherInterface} from "@chili-publish/publisher-interface";
 ```
 
 <br/>
 
-Then in your JavaScript code, get the iframe which is loading the Publisher editor, and pass that iframe element into the `build()` function of `PublisherInterface`.
+Subsequently, within your JavaScript code:
+- Retrieve the containing element
+- Invoke the buildOnElement method
 
 ```javascript
-const iframe = document.getElementById("editor-iframe");
-const publisher = PublisherInterface.build(iframe).then(
-    PublisherInterface => PublisherInterface.alert("Hi!")
+const editorDiv = document.getElementById("editor-div");
+const publisher = PublisherInterface.buildOnElement(editorDiv, "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0").then(
+    publisher => publisher.alert("Hi!")
 );
 ```
 
-🚨 **Important** - make sure that you call `build()` before the iframe `onload` event is fired. In practice this means that you should never call `build()` when that event is fired.
+<br/>
+
+The code above will create an iframe on the element with `id` "editor-div" using the URL passed in the function as the `src`.
+
+For iframe styling, use `publisher.iframe`.
+
+```javascript
+const editorDiv = document.getElementById("editor-div");
+const publisher = PublisherInterface.buildOnElement(editorDiv, "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0").then(
+    publisher => {
+        publisher.iframe.classList.add("coolIFrameStyleInCSS");
+    }
+);
+```
+
+<br/>
+<br/>
+
+We can also use the [async and await](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Promises#async_and_await) syntax. Here is the above example using async/await:
+
+```javascript
+const editorDiv = document.getElementById("editor-div");
+const publisher = await PublisherInterface.buildOnElement(editorDiv, "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0");
+publisher.iframe.classList.add("coolIFrameStyleInCSS");
+```
 
 <br/>
 
-In simple use cases, the below example will work well.
+Here is a complete example:
+```html
+<body>
+    <div id="editor-div"></div>
+    <iframe id="editor-iframe" style="width:1200px; height:800px"
+        src="https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0"></iframe>
+    <script type="module">
+        import {PublisherInterface} from 'https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js';
+    
+        const element = document.getElementById("editor-div");
+    
+        (async () => {
+            const publisher = await PublisherInterface.buildOnElement(element, "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0");
+            
+            publisher.iframe.classList.add("coolIFrameStyleInCSS");
+            
+            const documentName = await publisher.getObject("document.name");
+            
+            console.log(documentName);
+        })();
+    </script>
+</body>
+```
+<br/>
+
+## Your Own iframe
+In versions before 1.0, you would need to use your own iframe when building the `PublisherInterface` class.
+
+To utilize your iframe, employ the buildWithIframe() method.
+
 ```html
 <body>
     <iframe id="editor-iframe" style="width:1200px; height:800px"
-        src="https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G07gMFMq07X+SG2o8KlW8oAeZGqoB1a0YkbeZU1wJK15aIhANgZmhg+13NQlxpBEq7Q=="></iframe>
+        src="https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0"></iframe>
     <script type="module">
         import {PublisherInterface} from 'https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js';
     
         const iframe = document.getElementById("editor-iframe");
     
         (async () => {
-            const publisher = await PublisherInterface.build(iframe);
+            const publisher = await PublisherInterface.buildWithIframe(iframe);
             const documentName = await publisher.getObject("document.name");
             console.log(documentName);
         })();
     </script>
 </body>
+
 ```
 
 <br/>
-When dealing with larger applications, it's important to ensure that the `iframe` and the `PublisherInterface` build method are called in the same JavaScript event loop. To do this, follow these steps:
 
-1. Create the `iframe` element and set its `src` attribute.
-2. Pass the `iframe` element to the `build` method of `PublisherInterface` and capture the promise returned from the method.
-3. Append the `iframe` element to the DOM.
-4. Await the promise captured in step 2 and assign it to a variable that can be used throughout your application.
+🚨 **Important** - `buildWithIframe()` will not resolve if the iframe loads before build() is called. Prefer using `buildOnElement()`.
 
-Example Code:
+<br/>
 
-```html
-<body>
-  <script type="module">
-    import {PublisherInterface} from 'https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js';
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      (async () => {
-        const iframe = document.createElement("iframe");
-        iframe.src = "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G07gMFMq07X+SG2o8KlW8oAeZGqoB1a0YkbeZU1wJK15aIhANgZmhg+13NQlxpBEq7Q==";
-        const publisherPromise = PublisherInterface.build(iframe);
-        document.body.appendChild(iframe);
-        const publisher = await publisherPromise;
-        const documentName = await publisher.getObject("document.name");
-        console.log(documentName);
-      })();
-    });
-  </script>
-</body>
-```
 ## Debugging
-To enable debugging for the underlying library, pass {penpalDebug: true} as the buildOptions in your build function.
+Activate debugging by passing `{debug: true}` as the commonBuildOptions in your build function.
 
 ```javascript
-PublisherInterface.build(iframe, {penpalDebug: true});
+// If you are letting the iframe be built on an element
+PublisherInterface.buildOnElement(element, "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0", {debug: true})
+
+// If you are using your own iframe
+PublisherInterface.buildWithIframe(iframe, {debug: true});
 ```
 
-This will display messages in the console from Penpal about the communication between the iframe and the main page.
+This will display messages in the console about the communication between the iframe and the main page.
 
-If there's a possibility of a failure to connect, you can set a timeout. If the connection is not established before the timeout, an exception will be thrown. In the example below, the build method will throw a timeout after 10 seconds if no connection is established.
+<br/>
+
+To handle potential connection failures, define a timeout as demonstrated below.
 ```javascript
-PublisherInterface.build(iframe, {penpalDebug: true, timeout: 10000});
+// If you are letting the iframe be built on an element
+PublisherInterface.buildOnElement(element, "https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0", {debug: true, timeout: 10000})
+
+// If you are using your own iframe
+PublisherInterface.buildWithIframe(iframe, {debug: true, timeout: 10000});
 ```
+
+If the connection is not established before the timeout, an exception will be thrown. In the example below, the build method will throw a timeout after 10 seconds if no connection is established.
 
 <br/>
 
