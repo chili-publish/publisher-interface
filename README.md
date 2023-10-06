@@ -42,7 +42,7 @@ The Publisher Interface has 1 dependency which is the [Penpal](https://github.co
 
 All other dependencies are only for the developer tools such as auto generating docs, testing, and packaging. Developer dependencies will not always be up-to-date, and that is okay because our focus is to keep to keep the package up-to-date , and the developer tools only when releasing a new version.
 
-This means that their is very little security concerns, and the limitations are the same as those found in [Penpal](https://github.com/Aaronius/penpal)
+This means that there are very little security concerns, and the limitations are the same as those found in [Penpal](https://github.com/Aaronius/penpal)
 
 ### Browser Support
 
