@@ -243,7 +243,6 @@ export class PublisherInterface {
   static async buildWithIframe(targetIframe:HTMLIFrameElement, options:CommonBuildOptions) {
     return PublisherInterface.build({targetIframe, ...options})
   }
-
   static async buildOnElement(parentElement:HTMLElement, editorURL:string, options:CommonBuildOptions) {
     return PublisherInterface.build({parentElement, editorURL, ...options})
   }
@@ -268,11 +267,13 @@ export class PublisherInterface {
         debug: options.debug ?? originalOptions["penpalDebug"]
       }
     }
-    
+   
+    const stringifiedOptions = ((opts:AllBuildOptions) => {try {return JSON.stringify(opts)} catch (e:any) {return e.toString()}})(options);
+
     const publisherInterface = new PublisherInterface();
     publisherInterface.creationTime = new Date().toLocaleString();
     publisherInterface.debug = options.debug ?? false;
-    publisherInterface.createDebugLog({functionName:"build()", customMessage:"Calling build() with options: " + JSON.stringify(options)})
+    publisherInterface.createDebugLog({functionName:"build()", customMessage:"Calling build() with options: " + stringifiedOptions});
 
     const iframe = options.targetIframe ?? document.createElement("iframe");
     publisherInterface.iframe = iframe;
