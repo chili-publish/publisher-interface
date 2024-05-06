@@ -106,8 +106,6 @@ Here is a complete example:
 ```html
 <body>
     <div id="editor-div"></div>
-    <iframe id="editor-iframe" style="width:1200px; height:800px"
-        src="https://example.chili-publish.online/example/editor_html.aspx?doc=3d178228-a9b9-49d0-90d9-c1c8f8b67f05&apiKey=Sczs1ruhiZcaFiqg0G0"></iframe>
     <script type="module">
         import {PublisherInterface} from 'https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js';
     
