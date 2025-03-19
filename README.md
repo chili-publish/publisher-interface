@@ -37,6 +37,9 @@ bun install @chili-publish/publisher-interface
 import {PublisherInterface} from "https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js";
 ```
 
+*The suggested methods use third-party services not maintained or endorsed by CHILI publish. Please assess these services for reliability before use.*
+
+
 ## Dependencies
 The Publisher Interface has 1 dependency which is the [Penpal](https://github.com/Aaronius/penpal) library.
 
