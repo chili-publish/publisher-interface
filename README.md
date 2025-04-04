@@ -21,24 +21,47 @@ This project is officially supported by [CHILI publish](https://chili-publish.co
 📘 **Full documentation** is available on the [wiki](https://github.com/chili-publish/publisher-interface/wiki).
 
 ## Installation
-Install Publisher Interface using npm, yarn, bun, or directly in the browser via unpkg.
 
+### Method 1: Using Package Managers (Recommended)
+You can install the Publisher Interface through popular JavaScript package managers, such as:
+
+- **npm**   
+  ```bash
+  npm install @chili-publish/publisher-interface
+  ```
+
+- **yarn**  
+  ```bash
+  yarn add @chili-publish/publisher-interface
+  ```
+
+- **bun**  
+  ```bash
+  bun add @chili-publish/publisher-interface
+  ```
+
+<br/>
+
+### Method 2: Directly in the Browser (via CDN)
+The Publisher Interface can also be accessed directly in the browser using a Content Delivery Network (CDN) such as [unpkg](https://unpkg.com/) or [jsDelivr](https://www.jsdelivr.com/).
+
+Add the following import statement to your JavaScript file or <script> module tag for unpkg:
 ```javascript
-// npm
-npm i @chili-publish/publisher-interface
-
-// yarn
-yarn add @chili-publish/publisher-interface
-
-// bun
-bun install @chili-publish/publisher-interface
-
-// browser
 import {PublisherInterface} from "https://unpkg.com/@chili-publish/publisher-interface@latest/dist/PublisherInterface.min.js";
 ```
 
-*The suggested methods use third-party services not maintained or endorsed by CHILI publish. Please assess these services for reliability before use.*
+or, if you prefer jsDelivr:
+```javascript
+import {PublisherInterface} from "https://cdn.jsdelivr.net/npm/@chili-publish/publisher-interface/dist/PublisherInterface.min.js";
+```
 
+#### Notes on Using CDN Services
+When using CDN services such as unpkg or jsDelivr, please keep in mind the following:
+
+- These services are **third-party providers** and are not maintained or endorsed by CHILI publish.
+- While CDNs provide quick and easy integration, they may introduce risks such as version mismatches or outages. 
+
+To ensure full control, stability, and reliability, we **strongly recommend downloading and self-hosting** the JavaScript file within your application. This approach reduces dependency on external services and allows you to manage updates in a controlled environment.
 
 ## Dependencies
 The Publisher Interface has 1 dependency which is the [Penpal](https://github.com/Aaronius/penpal) library.
@@ -46,6 +69,8 @@ The Publisher Interface has 1 dependency which is the [Penpal](https://github.co
 All other dependencies are only for the developer tools such as auto generating docs, testing, and packaging. Developer dependencies will not always be up-to-date, and that is okay because our focus is to keep to keep the package up-to-date , and the developer tools only when releasing a new version.
 
 This means that there are very little security concerns, and the limitations are the same as those found in [Penpal](https://github.com/Aaronius/penpal)
+
+
 
 ### Browser Support
 
